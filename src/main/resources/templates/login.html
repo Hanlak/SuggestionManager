@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Login</h5>
+                </div>
+                <div class="card-body">
+                    <!-- error message -->
+                    <div th:if="${param.error}">
+                        <div class="alert alert-danger">Invalid username or
+                            password.
+                        </div>
+                    </div>
+                    <!-- logout message -->
+                    <div th:if="${param.logout}">
+                        <div class="alert alert-info">You have been logged out.</div>
+                    </div>
+                    <div th:if="${param.groupSessionExpired}">
+                        <div class="alert alert-info">Unable to Access Group Session.Please login again</div>
+                    </div>
+                    <div th:if="${param.info}">
+                        <div class="alert alert-info" th:text="${param.info}"></div>
+                    </div>
+                    <div th:if="${error}">
+                        <div class="alert alert-danger" th:text="${error}"></div>
+                    </div>
+                    <form th:action="@{/login}" method="post">
+                        <div class="form-userGroup">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" name="username"
+                                   placeholder="Enter your username">
+                        </div>
+                        <div class="form-userGroup">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="Enter your password">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Login</button>
+                        <a href="register" class="btn btn-link">Not a member yet? Register Here</a>
+                        <a href="forgotpassword" class="btn btn-link">Forgot Password?</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

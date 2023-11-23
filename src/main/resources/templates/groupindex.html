@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Index Page</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <div th:replace="/groupnavbar :: groupnavbar"></div>
+</div>
+<div class="container mt-4">
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <div id="suggestionTable">
+        <!-- Table for Buy Suggestions -->
+        <h1>Buy Suggestions</h1>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Stock Name</th>
+                <th>Min Buy</th>
+                <th>Max Buy</th>
+                <th>Target Price</th>
+                <th>Stop Loss</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="buySuggestionsTable">
+            <!-- Iterate over buySuggestionsList and populate table -->
+            <tr th:each="buySuggestion : ${buySuggestions}">
+                <td th:text="${buySuggestion.id}"></td>
+                <td th:text="${buySuggestion.stockName}"></td>
+                <td th:text="${buySuggestion.minBuy}"></td>
+                <td th:text="${buySuggestion.maxBuy}"></td>
+                <td th:text="${buySuggestion.target}"></td>
+                <td th:text="${buySuggestion.stopLoss}"></td>
+                <td>
+                    <!-- Add Edit and Delete buttons here -->
+                    <a th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
+                       class="btn btn-primary btn-sm">Edit</a>
+                    <!-- Delete button with link to delete controller -->
+                    <a th:href="@{/deleteSellSuggestion/{id}(id=${buySuggestion.id})}"
+                       class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            <!-- If buySuggestionsList is empty -->
+            <tr th:if="${buySuggestions.isEmpty()}">
+                <td colspan="7" class="text-center">No data available</td>
+            </tr>
+            </tbody>
+        </table>
+        <h1>Sell Suggestions</h1>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Stock Name</th>
+                <th>Warn Sell Level</th>
+                <th>Danger Sell Level</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody id="sellSuggestionsTable">
+            <!-- Iterate over sellSuggestions and populate table -->
+            <tr th:each="sellSuggestion : ${sellSuggestions}">
+                <td th:text="${sellSuggestion.id}"></td>
+                <td th:text="${sellSuggestion.stockName}"></td>
+                <td th:text="${sellSuggestion.warnSellLevel}"></td>
+                <td th:text="${sellSuggestion.dangerSellLevel}"></td>
+                <td>
+                    <!-- Add Edit and Delete buttons here -->
+                    <a th:href="@{/editSellSuggestion/{id}(id=${sellSuggestion.id})}"
+                       class="btn btn-primary btn-sm">Edit</a>
+                    <!-- Delete button with link to delete controller -->
+                    <a th:href="@{/deleteSellSuggestion/{id}(id=${sellSuggestion.id})}"
+                       class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+            <!-- If sellSuggestions is empty -->
+            <tr th:if="${sellSuggestions.isEmpty()}">
+                <td colspan="5" class="text-center">No data available</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

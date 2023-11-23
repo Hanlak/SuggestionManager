@@ -1,0 +1,42 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Display Requests</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div th:replace="/mainnavbar :: mainnavbar"></div>
+<div class="container mt-4">
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <h1 class="mb-4">Pending Requests</h1>
+
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+        <tr>
+            <th>User</th>
+            <th>Group</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Iterate through the pending requests -->
+        <tr th:each="request : ${pendingRequests}">
+            <td th:text="${request.user.userName}"></td>
+            <td th:text="${request.userGroup.groupName}"></td>
+            <td>
+                <a class="btn btn-success btn-sm" href="#" role="button">Accept</a>
+                <a class="btn btn-danger btn-sm" href="#" role="button">Reject</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

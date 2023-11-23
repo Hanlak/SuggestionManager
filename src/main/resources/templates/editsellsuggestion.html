@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Edit Sell Suggestion</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container mt-5">
+    <h1>Edit Sell Suggestion</h1>
+    <form action="@{/suggestion/updateSellSuggestion}" th:object="${sellSuggestion}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+        <div class="form-group">
+            <label for="stockName">Stock Name:</label>
+            <input type="text" class="form-control" id="stockName" th:value="${sellSuggestion.stockName}"
+                   th:field="*{stockName}"/>
+        </div>
+        <div class="form-group">
+            <label for="warnSellLevel">Warn Sell Level:</label>
+            <input type="text" class="form-control" id="warnSellLevel" th:value="${sellSuggestion.warnSellLevel}"
+                   th:field="*{warnSellLevel}"/>
+        </div>
+        <div class="form-group">
+            <label for="dangerSellLevel">Danger Sell Level:</label>
+            <input type="text" class="form-control" id="dangerSellLevel" th:value="${sellSuggestion.dangerSellLevel}"
+                   th:field="*{dangerSellLevel}"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+</div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-Je4mDv3F6O0MKqr+q6t5ldy/DZwz27b1efwx5K/kD5XJc/2aKpr5K9CK6Z5vT5M5"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
+        crossorigin="anonymous"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Create Group</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <div th:replace="/mainnavbar :: mainnavbar"></div>
+</div>
+<div class="container mt-5">
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <form th:action="@{/groups/createGroup}" method="post">
+        <div class="form-group">
+            <label for="groupName">Group Name:</label>
+            <input type="text" class="form-control form-control-sm" id="groupName" name="groupName"
+                   placeholder="Enter Group Name"
+                   required>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Group</button>
+    </form>
+</div>
+</body>
+</html>

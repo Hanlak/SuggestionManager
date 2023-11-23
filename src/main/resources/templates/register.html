@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Register Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Register To SSM</h5>
+                </div>
+                <div class="card-body">
+                    <div th:if="${info}">
+                        <div class="alert alert-info" th:text="${info}"></div>
+                    </div>
+                    <div th:if="${error}">
+                        <div class="alert alert-danger" th:text="${error}"></div>
+                    </div>
+                    <form th:action="@{/register}" method="post" th:object="${user}">
+                        <div class="form-userGroup">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" th:field="*{name}"
+                                   placeholder="Enter your name" required autofocus>
+                        </div>
+                        <div class="form-userGroup">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" th:field="*{username}"
+                                   placeholder="Enter your username" required autofocus>
+                        </div>
+                        <div class="form-userGroup">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" th:field="*{email}"
+                                   placeholder="Enter your email" required autofocus>
+                        </div>
+                        <div class="form-userGroup">
+                            <label for="password">Password</label>
+                            <input type="password" class="form-control" id="password" th:field="*{password}"
+                                   placeholder="Enter your password" required autofocus>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Register</button>
+                        <a href="login" class="btn btn-link">Already a Member? Login Here</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>

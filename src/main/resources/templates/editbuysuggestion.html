@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Edit BUY Suggestion</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <div th:replace="/groupnavbar :: groupnavbar"></div>
+</div>
+<div class="container mt-5">
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <form th:action="@{/suggestion/editBuySuggestion}" method="post" th:object="${buySuggestion}">
+        <input type="hidden" name="id" th:value="${id}"/>
+        <div class="form-group form-control-md">
+            <label for="stockName">stock Name:</label>
+            <input type="text" class="form-control form-control-sm" id="stockName" name="stockName"
+                   th:value="${buySuggestion.stockName}" required/>
+        </div>
+        <div class="form-group form-control-md">
+            <label for="buyPriority">Buy Priority:</label>
+            <select class="form-control" id="buyPriority" name="buyPriority" required>
+                <option th:each="priority : ${priorities}"
+                        th:value="${priority}"
+                        th:text="${priority}"
+                        th:selected="${priority eq buySuggestion.buyPriority}">
+                </option>
+            </select>
+        </div>
+        <div class="form-group form-control-md">
+            <label for="minBuy">Min Buy:</label>
+            <input type="text" class="form-control" id="minBuy" name="minBuy" th:value="${buySuggestion.minBuy}"
+                   required/>
+        </div>
+        <div class="form-group form-control-md">
+            <label for="maxBuy">Max Buy:</label>
+            <input type="text" class="form-control" id="maxBuy" name="maxBuy" th:value="${buySuggestion.maxBuy}"
+                   required/>
+        </div>
+        <div class="form-group form-control-md">
+            <label for="targetPrice">Target Price:</label>
+            <input type="text" class="form-control" id="targetPrice" name="target" th:value="${buySuggestion.target}"
+                   required/>
+        </div>
+        <div class="form-group form-control-md">
+            <label for="stopLoss">Stop Loss:</label>
+            <input type="text" class="form-control" id="stopLoss" name="stopLoss" th:value="${buySuggestion.stopLoss}"
+                   required/>
+        </div>
+        <div class="form-group form-control-md">
+            <label for="qbos">Quantity Based on Suggestion:</label>
+            <input type="text" class="form-control" id="qbos" name="qbos" th:value="${buySuggestion.qbos}" required/>
+        </div>
+        <button type="submit" class="btn btn-primary">update</button>
+    </form>
+</div>
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-Je4mDv3F6O0MKqr+q6t5ldy/DZwz27b1efwx5K/kD5XJc/2aKpr5K9CK6Z5vT5M5"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
+        crossorigin="anonymous"></script>
+</body>
+</html>
