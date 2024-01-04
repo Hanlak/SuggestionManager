@@ -1,38 +1,57 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Edit Sell Suggestion</title>
-    <!-- Bootstrap CSS -->
+    <title>Edit BUY Suggestion</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
           integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
           crossorigin="anonymous">
 </head>
 <body>
+<div>
+    <div th:replace="/groupnavbar :: groupnavbar"></div>
+</div>
 <div class="container mt-5">
-    <h1>Edit Sell Suggestion</h1>
-    <form action="@{/suggestion/updateSellSuggestion}" th:object="${sellSuggestion}" method="post">
-        <input type="hidden" th:field="*{id}"/>
-        <div class="form-group">
-            <label for="stockName">Stock Name:</label>
-            <input type="text" class="form-control" id="stockName" th:value="${sellSuggestion.stockName}"
-                   th:field="*{stockName}"/>
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <form th:action="@{/suggestion/editSellSuggestion}" method="post" th:object="${sellSuggestion}">
+        <input type="hidden" name="id" th:value="${id}"/>
+        <div class="form-group form-control-md">
+            <label for="stockName">stock Name:</label>
+            <input type="text" class="form-control form-control-sm" id="stockName" name="stockName"
+                   th:value="${sellSuggestion.stockName}" required/>
         </div>
-        <div class="form-group">
+        <div class="form-group form-control-md">
+            <label for="sellPriority">Sell Priority:</label>
+            <select class="form-control" id="sellPriority" name="sellPriority" required>
+                <option th:each="priority : ${priorities}"
+                        th:value="${priority}"
+                        th:text="${priority}"
+                        th:selected="${priority eq sellSuggestion.sellPriority}">
+                </option>
+            </select>
+        </div>
+        <div class="form-group form-control-md">
             <label for="warnSellLevel">Warn Sell Level:</label>
-            <input type="text" class="form-control" id="warnSellLevel" th:value="${sellSuggestion.warnSellLevel}"
-                   th:field="*{warnSellLevel}"/>
+            <input type="text" class="form-control" id="warnSellLevel" name="warnSellLevel"
+                   th:value="${sellSuggestion.warnSellLevel}"
+                   required/>
         </div>
-        <div class="form-group">
-            <label for="dangerSellLevel">Danger Sell Level:</label>
-            <input type="text" class="form-control" id="dangerSellLevel" th:value="${sellSuggestion.dangerSellLevel}"
-                   th:field="*{dangerSellLevel}"/>
+        <div class="form-group form-control-md">
+            <label for="dangerSellLevel">Danger Sell Level</label>
+            <input type="text" class="form-control" id="dangerSellLevel" name="dangerSellLevel"
+                   th:value="${sellSuggestion.dangerSellLevel}"
+                   required/>
         </div>
-        <button type="submit" class="btn btn-primary">Update</button>
+        <div class="form-group form-control-md">
+            <label for="pso">PSO</label>
+            <input type="text" class="form-control" id="pso" name="pso" th:value="${sellSuggestion.pso}"
+                   required/>
+        </div>
+        <button type="submit" class="btn btn-primary">update</button>
     </form>
 </div>
-
 <!-- Bootstrap JS and jQuery -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

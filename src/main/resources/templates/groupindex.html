@@ -46,7 +46,7 @@
                     <a th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
                        class="btn btn-primary btn-sm">Edit</a>
                     <!-- Delete button with link to delete controller -->
-                    <a th:href="@{/deleteSellSuggestion/{id}(id=${buySuggestion.id})}"
+                    <a th:href="@{'/suggestion/deleteSuggestion/'+ ${buySuggestion.id}}"
                        class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
@@ -76,10 +76,10 @@
                 <td th:text="${sellSuggestion.dangerSellLevel}"></td>
                 <td>
                     <!-- Add Edit and Delete buttons here -->
-                    <a th:href="@{/editSellSuggestion/{id}(id=${sellSuggestion.id})}"
+                    <a th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"
                        class="btn btn-primary btn-sm">Edit</a>
                     <!-- Delete button with link to delete controller -->
-                    <a th:href="@{/deleteSellSuggestion/{id}(id=${sellSuggestion.id})}"
+                    <a th:href="@{'/suggestion/deleteSuggestion/'+ ${sellSuggestion.id}}"
                        class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>

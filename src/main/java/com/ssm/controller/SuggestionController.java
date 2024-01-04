@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -70,11 +71,9 @@ public class SuggestionController {
     @PostMapping("/submitBuy")
     public String submitBuy(@SessionAttribute("userGroup") UserGroup userGroup, @ModelAttribute("buySuggestion") BuySuggestionDTO buySuggestionDTO, RedirectAttributes redirectAttributes) {
         try {
-            System.out.println(userGroup.getGroupName());
             suggestionService.addBuySuggestion(userGroup, buySuggestionDTO);
             return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
         } catch (DataAccessException dataAccessException) {
-            dataAccessException.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Error While Saving Buy Data");
             return "redirect:/suggestion/suggestionForm";
         } catch (GroupSessionException groupSessionException) {
@@ -98,49 +97,85 @@ public class SuggestionController {
     }
 
     @GetMapping("/editBuySuggestion/{id}")
-    public String showEditBuySuggestion(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditBuySuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
+            if (ObjectUtils.isEmpty(userGroup))
+                throw new GroupSessionException("Group Session Expired.Please Re-Login again");
             BuySuggestion buySuggestion = suggestionService.getBuySuggestionById(id);
             model.addAttribute("id", id);
             model.addAttribute("priorities", priorities);
             model.addAttribute("buySuggestion", buySuggestion);
         } catch (SuggestionNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/groupindex";
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
         } catch (DataAccessException e) {
             redirectAttributes.addFlashAttribute("error", "System Error: while Accessing the data");
-            return "redirect:/groupindex";
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+        } catch (GroupSessionException groupSessionException) {
+            return "redirect:/logout?groupSessionExpired";
         }
         return "editbuysuggestion";
     }
 
     @GetMapping("/editSellSuggestion/{id}")
-    public String showEditSellSuggestion(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditSellSuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
-            SellSuggestion sellSuggestion = suggestionService.getSellSuggestion(id);
+            if (ObjectUtils.isEmpty(userGroup))
+                throw new GroupSessionException("Group Session Expired.Please Re-Login again");
+            SellSuggestion sellSuggestion = suggestionService.getSellSuggestionById(id);
             model.addAttribute("id", id);
+            model.addAttribute("priorities", priorities);
             model.addAttribute("sellSuggestion", sellSuggestion);
         } catch (SuggestionNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
-            return "redirect:/groupindex";
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
         } catch (DataAccessException e) {
             redirectAttributes.addFlashAttribute("error", "System Error: while Accessing the data");
-            return "redirect:/groupindex";
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+        } catch (GroupSessionException groupSessionException) {
+            return "redirect:/logout?groupSessionExpired";
         }
         return "editsellsuggestion";
     }
 
     @PostMapping("/editBuySuggestion")
-    public String updateBuySuggestion(@RequestParam("id") Long id, @ModelAttribute("buySuggestion") BuySuggestionDTO buySuggestionDTO, Principal principal, RedirectAttributes redirectAttributes) {
-        System.out.println("ID:" + id);
-        System.out.println(buySuggestionDTO.getStockName());
-        System.out.println(buySuggestionDTO.getMinBuy());
-        System.out.println(buySuggestionDTO.getMaxBuy());
-        System.out.println(buySuggestionDTO.getTarget());
-        System.out.println(buySuggestionDTO.getStopLoss());
-        redirectAttributes.addFlashAttribute("info", "UserGroup Created Successfully");
-        return "redirect:/index";
+    public String updateBuySuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("id") Long id, @ModelAttribute("buySuggestion") BuySuggestionDTO buySuggestionDTO, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            suggestionService.updateBuySuggestion(userGroup, id, buySuggestionDTO);
+        } catch (SuggestionNotFoundException | DataAccessException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+        } catch (GroupSessionException groupSessionException) {
+            return "redirect:/logout?groupSessionExpired";
+        }
+        redirectAttributes.addFlashAttribute("info", "Suggestion Update Success");
+        return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
     }
 
+    @PostMapping("/editSellSuggestion")
+    public String updateSellSuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("id") Long id, @ModelAttribute("SellSuggestionDTO") SellSuggestionDTO sellSuggestionDTO, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            suggestionService.updateSellSuggestion(userGroup, id, sellSuggestionDTO);
+        } catch (SuggestionNotFoundException | DataAccessException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+        } catch (GroupSessionException groupSessionException) {
+            return "redirect:/logout?groupSessionExpired";
+        }
+        return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+    }
 
+    @GetMapping("/deleteSuggestion/{id}")
+    public String deleteSuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            suggestionService.deleteSuggestion(userGroup, id);
+        } catch (SuggestionNotFoundException | DataAccessException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+        } catch (GroupSessionException groupSessionException) {
+            return "redirect:/logout?groupSessionExpired";
+        }
+        return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+
+    }
 }
