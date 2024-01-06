@@ -127,14 +127,13 @@ public class GroupService {
         return pendingRequests;
     }
 
-    @Transactional
-    public Boolean requestStatusUpdate(String id, String status) {
-        Long groupId = Long.valueOf(id);
+
+    public Boolean requestStatusUpdate(Long groupRequestId, String status) {
         GroupRequest.RequestStatus requestStatus = "ACCEPTED".equals(status) ? GroupRequest.RequestStatus.ACCEPTED : GroupRequest.RequestStatus.REJECTED;
-        int savedState = groupRequestRepository.changeStatusToPending(requestStatus, groupId);
+        int savedState = groupRequestRepository.changeStatusToPending(requestStatus, groupRequestId);
         //add the user to the group
         if (savedState != 0 && "ACCEPTED".equals(status)) {
-            Optional<GroupRequest> groupRequest = groupRequestRepository.findById(groupId);
+            Optional<GroupRequest> groupRequest = groupRequestRepository.findById(groupRequestId);
             if (groupRequest.isPresent()) {
                 User user = groupRequest.get().getUser();
                 UserGroup userGroup = groupRequest.get().getUserGroup();

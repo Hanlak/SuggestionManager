@@ -8,7 +8,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -22,7 +21,7 @@ public class GroupRequestController {
     }
 
     @GetMapping("/request/{id}/{status}")
-    public ModelAndView requestUpdate(@PathVariable("id") String id, @PathVariable("status") String status, ModelMap model) {
+    public ModelAndView requestUpdate(@PathVariable("id") long id, @PathVariable("status") String status, ModelMap model) {
 
         try {
             Boolean isStatusUpdated = groupService.requestStatusUpdate(id, status);

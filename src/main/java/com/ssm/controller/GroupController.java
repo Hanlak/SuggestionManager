@@ -82,34 +82,6 @@ public class GroupController {
     }
 
 
-    @GetMapping("/deleteGroup")
-    public ModelAndView deleteGroup(Principal principal) {
-        ModelAndView modelAndView = new ModelAndView("deletegroup");
-        modelAndView.addObject("username", principal.getName());
-        return modelAndView;
-    }
-
-
-    @PostMapping("/deleteGroup")
-    public ModelAndView deleteGroup(@RequestParam("groupName") String groupName, Principal principal) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            groupService.deleteGroup(groupName, principal.getName());
-            modelAndView.addObject("info", "Group Deleted Successfully");
-            modelAndView.setViewName("index");
-            return modelAndView;
-        } catch (UserNotFoundException userNotFoundException) {
-            modelAndView.addObject("info", userNotFoundException.getMessage());
-            modelAndView.setViewName("index");
-            return modelAndView;
-        } catch (DataAccessException dataAccessException) {
-            modelAndView.addObject("error", "Trouble While Performing Delete Action.Please Try Again");
-            modelAndView.setViewName("index");
-            return modelAndView;
-        }
-    }
-
-
     @GetMapping("/displayRequests")
     public ModelAndView displayRequests(Principal principal) {
         ModelAndView modelAndView = new ModelAndView();

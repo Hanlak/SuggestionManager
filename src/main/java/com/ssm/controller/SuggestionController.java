@@ -8,6 +8,7 @@ import com.ssm.entity.UserGroup;
 import com.ssm.exception.GroupNotFoundException;
 import com.ssm.exception.GroupSessionException;
 import com.ssm.exception.SuggestionNotFoundException;
+import com.ssm.exception.UserNotFoundException;
 import com.ssm.service.GroupService;
 import com.ssm.service.SuggestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -185,4 +187,28 @@ public class SuggestionController {
         return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
 
     }
+
+    @GetMapping("/deleteGroup")
+    public ModelAndView deleteGroup(Principal principal) {
+        ModelAndView modelAndView = new ModelAndView("deletegroup");
+        modelAndView.addObject("username", principal.getName());
+        return modelAndView;
+    }
+
+
+    @PostMapping("/deleteGroup")
+    public String deleteGroup(@RequestParam("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            groupService.deleteGroup(groupName, principal.getName());
+            redirectAttributes.addFlashAttribute("info", "Group Deleted Successfully");
+            return "redirect:/index";
+        } catch (UserNotFoundException userNotFoundException) {
+            redirectAttributes.addFlashAttribute("info", userNotFoundException.getMessage());
+            return "redirect:/index";
+        } catch (DataAccessException dataAccessException) {
+            redirectAttributes.addFlashAttribute("error", "Trouble While Performing Delete Action.Please Try Again");
+            return "redirect:/index";
+        }
+    }
+
 }
