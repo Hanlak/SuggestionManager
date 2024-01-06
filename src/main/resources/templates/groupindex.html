@@ -29,6 +29,7 @@
                 <th>Max Buy</th>
                 <th>Target Price</th>
                 <th>Stop Loss</th>
+                <th>QBOS</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -41,6 +42,7 @@
                 <td th:text="${buySuggestion.maxBuy}"></td>
                 <td th:text="${buySuggestion.target}"></td>
                 <td th:text="${buySuggestion.stopLoss}"></td>
+                <td th:text="${buySuggestion.qbos}"></td>
                 <td>
                     <!-- Add Edit and Delete buttons here -->
                     <a th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
@@ -64,6 +66,7 @@
                 <th>Stock Name</th>
                 <th>Warn Sell Level</th>
                 <th>Danger Sell Level</th>
+                <th>PSO</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -74,6 +77,7 @@
                 <td th:text="${sellSuggestion.stockName}"></td>
                 <td th:text="${sellSuggestion.warnSellLevel}"></td>
                 <td th:text="${sellSuggestion.dangerSellLevel}"></td>
+                <td th:text="${sellSuggestion.pso}"></td>
                 <td>
                     <!-- Add Edit and Delete buttons here -->
                     <a th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"

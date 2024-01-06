@@ -64,7 +64,14 @@ public class SuggestionController {
 
     //TODO: PREVENT DIRECT ACCESS TO THIS URL;
     @GetMapping("/suggestionForm")
-    public String showSuggestionForm(Model model) {
+    public String showSuggestionForm(@SessionAttribute("userGroup") UserGroup userGroup, Model model) {
+        try {
+            if (ObjectUtils.isEmpty(userGroup))
+                throw new GroupSessionException("Group Session Expired.Please Re-Login again");
+        } catch (GroupSessionException groupSessionException) {
+            return "redirect:/logout?groupSessionExpired";
+        }
+        model.addAttribute("groupName", userGroup.getGroupName());
         return "suggestionform";
     }
 
