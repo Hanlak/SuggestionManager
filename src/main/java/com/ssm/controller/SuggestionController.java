@@ -5,10 +5,7 @@ import com.ssm.dto.SellSuggestionDTO;
 import com.ssm.entity.BuySuggestion;
 import com.ssm.entity.SellSuggestion;
 import com.ssm.entity.UserGroup;
-import com.ssm.exception.GroupNotFoundException;
-import com.ssm.exception.GroupSessionException;
-import com.ssm.exception.SuggestionNotFoundException;
-import com.ssm.exception.UserNotFoundException;
+import com.ssm.exception.*;
 import com.ssm.service.GroupService;
 import com.ssm.service.SuggestionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,10 +187,10 @@ public class SuggestionController {
 
     //TODO: session expiry exception handling;;
     @GetMapping("/deleteGroup")
-    public ModelAndView deleteGroup(@SessionAttribute("userGroup") UserGroup userGroup,Principal principal) {
+    public ModelAndView deleteGroup(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal) {
         ModelAndView modelAndView = new ModelAndView("deletegroup");
         modelAndView.addObject("username", principal.getName());
-        modelAndView.addObject("groupName",userGroup.getGroupName());
+        modelAndView.addObject("groupName", userGroup.getGroupName());
         return modelAndView;
     }
 
@@ -211,6 +208,24 @@ public class SuggestionController {
             redirectAttributes.addFlashAttribute("error", "Trouble While Performing Delete Action.Please Try Again");
             return "redirect:/index";
         }
+    }
+
+
+    @GetMapping("/leaveGroup")
+    public String leaveGroup(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            groupService.leaveGroup(userGroup.getGroupName(), principal.getName());
+        } catch (GroupNotFoundException groupNotFoundException) {
+            redirectAttributes.addFlashAttribute("info", groupNotFoundException.getMessage());
+            return "redirect:/index";
+        } catch (DataAccessException dataAccessException) {
+            redirectAttributes.addFlashAttribute("error", "Trouble While Performing Leave Action.Please Try Again");
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+        } catch (LeaveGroupException leaveGroupException) {
+            redirectAttributes.addFlashAttribute("error", "Trouble While Performing Leave Action.Please Try Again");
+            return "redirect:/index"; // should go to group Index
+        }
+        return "redirect:/index";
     }
 
 }

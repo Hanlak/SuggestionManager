@@ -51,6 +51,11 @@ public class User {
     )
     private Set<UserGroup> userGroups = new HashSet<>();
 
+    // Method to remove a user from user groups
+    public void removeFromUserGroups(UserGroup userGroup) {
+        this.getUserGroups().remove(userGroup);
+        userGroup.getUsers().remove(this);
+    }
 
     public User(String fullName, String userName, String email, String password, Collection<Role> roles) {
         this.fullName = fullName;

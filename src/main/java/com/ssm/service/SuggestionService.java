@@ -96,6 +96,8 @@ public class SuggestionService {
         suggestionRepository.deleteById(id);
     }
 
+
+
     //ALL These needs to be handled with proper exceptions;
     public List<BuySuggestion> getBuySuggestions() {
         return buySuggestionRepository.findAll();

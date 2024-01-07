@@ -29,5 +29,10 @@ public class UserGroup {
     @ManyToMany(mappedBy = "userGroups")
     private Set<User> users = new HashSet<>();
 
+    // Method to remove a user from the user group
+    public void removeUser(User user) {
+        this.getUsers().remove(user);
+        user.getUserGroups().remove(this);
+    }
 
 }

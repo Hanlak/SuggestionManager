@@ -19,6 +19,7 @@ public interface GroupRequestRepository extends JpaRepository<GroupRequest, Long
     Optional<GroupRequest> findByUser(User user);
 
     void deleteByUserGroup(UserGroup userGroup);
+    void deleteByUser(User user);
 
     List<GroupRequest> findByUserGroupAndStatus(UserGroup userGroup, GroupRequest.RequestStatus status);
 

@@ -3,10 +3,7 @@ package com.ssm.service;
 import com.ssm.entity.GroupRequest;
 import com.ssm.entity.User;
 import com.ssm.entity.UserGroup;
-import com.ssm.exception.GroupNotFoundException;
-import com.ssm.exception.GroupRequestException;
-import com.ssm.exception.UserAlreadyExistsException;
-import com.ssm.exception.UserNotFoundException;
+import com.ssm.exception.*;
 import com.ssm.repository.GroupRepository;
 import com.ssm.repository.GroupRequestRepository;
 import com.ssm.repository.UserRepository;
@@ -107,6 +104,48 @@ public class GroupService {
         } else {
             throw new UserNotFoundException("Group did not Exist to delete");
         }
+    }
+
+    /**
+     * In the phase just deleting the group if admin leaves the group
+     * we will show a warning before leaving the group which means deleting the group
+     **/
+    public void leaveGroup(String groupName, String userName) throws LeaveGroupException, GroupNotFoundException {
+        Optional<UserGroup> userGroup = groupRepository.findByGroupName(groupName);
+        if (userGroup.isPresent()) {
+            if (userName.equals(userGroup.get().getAdmin().getUserName())) {
+                groupRepository.deleteById(userGroup.get().getId());
+                groupRequestRepository.deleteByUserGroup(userGroup.get());
+//                //if there are no users then delete the entire group to release the group-name
+//                if (userGroup.get().getUsers().isEmpty()) {
+//                    groupRepository.deleteById(userGroup.get().getId());
+//                    groupRequestRepository.deleteByUserGroup(userGroup.get());
+//                } else {
+//                    User newAdmin = userGroup.get().getUsers().stream().findAny().orElse(null);
+//                    if (!ObjectUtils.isEmpty(newAdmin)) {
+//                        groupRepository.removeUserFromGroup(newAdmin, userGroup.get());
+//                    }
+//                }
+            } else {
+                User member = userGroup.get().getUsers().stream()
+                        .filter(user -> user.getUserName().equals(userName))
+                        .findFirst().orElse(null);
+                if (!ObjectUtils.isEmpty(member)) {
+                    userGroup.get().removeUser(member);
+                    member.removeFromUserGroups(userGroup.get());
+                    userRepository.save(member);
+                    groupRepository.save(userGroup.get());
+                    groupRequestRepository.deleteByUser(member);
+                } else {
+                    throw new LeaveGroupException("Unable to find the member in" + userGroup.get().getGroupName());
+                }
+            }
+        } else {
+            throw new GroupNotFoundException("Group did not Exist to delete");
+        }
+
+        //Check for admin
+
     }
 
     public List<UserGroup> getAllGroupsBasedOnUser(String adminUser) throws UserNotFoundException {
