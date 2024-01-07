@@ -11,20 +11,33 @@
 </head>
 <body>
 <div>
-    <div th:replace="/mainnavbar :: mainnavbar"></div>
+    <div th:replace="/groupnavbar :: groupnavbar"></div>
 </div>
 <div class="container mt-5">
     <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
     <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-    <form th:action="@{/suggestion/deleteGroup}" method="post">
+    <form id="deleteGroupForm" th:action="@{/suggestion/deleteGroup}" method="post">
         <div class="form-group">
             <label for="groupName">Group Name:</label>
             <input type="text" class="form-control form-control-sm" id="groupName" name="groupName"
-                   placeholder="Enter Group Name"
+                   placeholder="reconfirm the group name to delete permanently"
                    required>
         </div>
         <button type="submit" class="btn btn-primary">Delete Group</button>
     </form>
 </div>
+
+<script th:inline="javascript">
+    document.getElementById('deleteGroupForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var inputGroupName = document.getElementById('groupName').value;
+        var modelGroupName = [[ ${groupName} ]]
+        if (inputGroupName === modelGroupName) {
+            this.submit();
+        } else {
+            window.alert('Group Name does not match. Please reconfirm.');
+        }
+    });
+</script>
 </body>
 </html>

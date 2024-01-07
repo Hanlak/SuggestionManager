@@ -188,10 +188,12 @@ public class SuggestionController {
 
     }
 
+    //TODO: session expiry exception handling;;
     @GetMapping("/deleteGroup")
-    public ModelAndView deleteGroup(Principal principal) {
+    public ModelAndView deleteGroup(@SessionAttribute("userGroup") UserGroup userGroup,Principal principal) {
         ModelAndView modelAndView = new ModelAndView("deletegroup");
         modelAndView.addObject("username", principal.getName());
+        modelAndView.addObject("groupName",userGroup.getGroupName());
         return modelAndView;
     }
 
