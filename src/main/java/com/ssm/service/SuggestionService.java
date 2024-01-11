@@ -109,6 +109,7 @@ public class SuggestionService {
             throw new GroupSessionException("Group Session Expired.Please Re-login again");
         }
         suggestionRepository.deleteById(id);
+        likesRepository.deleteBySuggestionId(id);
     }
 
 
@@ -181,7 +182,7 @@ public class SuggestionService {
     public Map<Long, Boolean> userSuggestionChoice(String username) throws UserNotFoundException, LikesException {
         Map<Long, Boolean> suggestionLikeBasedOnUser = new HashMap<>();
         User user = getUserForLikes(username);
-        List<Likes> likes = likesRepository.findByUser(user);
+        List<Likes> likes = likesRepository.findByUser(user).orElse(null);
         if (ObjectUtils.isEmpty(likes)) return suggestionLikeBasedOnUser;
         for (Likes like : likes) {
             suggestionLikeBasedOnUser.put(like.getSuggestion().getId(), like.isLiked());
