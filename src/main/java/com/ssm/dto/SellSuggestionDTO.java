@@ -16,4 +16,6 @@ public class SellSuggestionDTO {
     private String warnSellLevel;
     private String dangerSellLevel;
     private String pso;
+    private int noOfLikes;
+
 }

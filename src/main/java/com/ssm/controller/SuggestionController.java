@@ -1,6 +1,8 @@
 package com.ssm.controller;
 
+import com.ssm.dto.BuyLikeSuggestionDTO;
 import com.ssm.dto.BuySuggestionDTO;
+import com.ssm.dto.SellLikeSuggestionDTO;
 import com.ssm.dto.SellSuggestionDTO;
 import com.ssm.entity.BuySuggestion;
 import com.ssm.entity.SellSuggestion;
@@ -43,17 +45,17 @@ public class SuggestionController {
     public String groupIndex(@PathVariable("id") Long groupId,
                              @PathVariable("groupName") String groupName,
                              RedirectAttributes redirectAttributes,
-                             Model model) {
+                             Model model, Principal principal) {
         try {
             UserGroup userGroup = groupService.getUserGroupBasedOnGroupId(groupId);
             model.addAttribute("userGroup", userGroup);
-            List<BuySuggestion> buySuggestionList = suggestionService.getBuySuggestions();
-            List<SellSuggestion> sellSuggestionList = suggestionService.getSellSuggestions();
+            List<BuyLikeSuggestionDTO> buySuggestionList = suggestionService.getBuyLikeSuggestions(principal.getName());
+            List<SellLikeSuggestionDTO> sellSuggestionList = suggestionService.getSellLikeSuggestions(principal.getName());
             model.addAttribute("buySuggestions", buySuggestionList);
             model.addAttribute("sellSuggestions", sellSuggestionList);
             return "groupindex";
-        } catch (GroupNotFoundException groupNotFoundException) {
-            redirectAttributes.addFlashAttribute("error", groupNotFoundException.getMessage());
+        } catch (GroupNotFoundException | UserNotFoundException | LikesException e) {
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/index";
         } catch (DataAccessException dataAccessException) {
             redirectAttributes.addFlashAttribute("error", "Error While Accessing Data while Fetching the Group");
@@ -226,6 +228,23 @@ public class SuggestionController {
             return "redirect:/index"; // should go to group Index
         }
         return "redirect:/index";
+    }
+
+    @PostMapping("/buyLike")
+    public String buyLike(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("buySuggestionId") Long buySuggestionId, @RequestParam("buyLiked") boolean buyLiked, Principal principal, RedirectAttributes redirectAttributes) {
+        System.out.println(buySuggestionId + "" + buyLiked);
+        try {
+            suggestionService.likeBuySuggestion(buySuggestionId, buyLiked, principal.getName());
+        } catch (SuggestionNotFoundException | UserNotFoundException | LikesException e) {
+            throw new RuntimeException(e);
+        }
+        return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+    }
+
+    @PostMapping("/sellLike")
+    public String sellLike(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("sellSuggestionId") String sellSuggestionId, @RequestParam("sellLiked") boolean sellLiked, Principal principal, RedirectAttributes redirectAttributes) {
+        System.out.println(sellSuggestionId + "" + sellLiked);
+        return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
     }
 
 }

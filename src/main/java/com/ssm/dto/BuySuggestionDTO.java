@@ -18,4 +18,5 @@ public class BuySuggestionDTO {
     private String target;
     private String stopLoss;
     private String qbos;
+    private int noOfLikes;
 }

@@ -30,6 +30,7 @@
                 <th>Target Price</th>
                 <th>Stop Loss</th>
                 <th>QBOS</th>
+                <th>Confidence</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -43,7 +44,14 @@
                 <td th:text="${buySuggestion.target}"></td>
                 <td th:text="${buySuggestion.stopLoss}"></td>
                 <td th:text="${buySuggestion.qbos}"></td>
+                <td th:text="${buySuggestion.noOfLikes}">
                 <td>
+
+                    <a id="likeBuyButton" class="btn btn-primary btn-sm"
+                       th:onclick="toggleBuyLike([[${buySuggestion.id}]],[[${buySuggestion.likeState}]])"
+                       th:text="${buySuggestion.likeState? 'Unlike' : 'Like'}"></a>
+
+
                     <!-- Add Edit and Delete buttons here -->
                     <a th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
                        class="btn btn-primary btn-sm">Edit</a>
@@ -67,6 +75,7 @@
                 <th>Warn Sell Level</th>
                 <th>Danger Sell Level</th>
                 <th>PSO</th>
+                <th>Confidence</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -78,7 +87,14 @@
                 <td th:text="${sellSuggestion.warnSellLevel}"></td>
                 <td th:text="${sellSuggestion.dangerSellLevel}"></td>
                 <td th:text="${sellSuggestion.pso}"></td>
+                <td th:text="${sellSuggestion.noOfLikes}">
+                </td>
                 <td>
+
+                    <a id="likeSellButton" class="btn btn-primary btn-sm"
+                       th:onclick="toggleSellLike([[${sellSuggestion.id}]],[[${sellSuggestion.likeState}]])"
+                       th:text="${sellSuggestion.likeState? 'Unlike' : 'Like'}"></a>
+
                     <!-- Add Edit and Delete buttons here -->
                     <a th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"
                        class="btn btn-primary btn-sm">Edit</a>
@@ -95,5 +111,77 @@
         </table>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script th:inline="javascript">
+function toggleBuyLike(buySuggestionId,buyLiked) {
+    const likeBuyButton = document.getElementById('likeBuyButton');
+    buyLiked = !buyLiked;
+    if (buyLiked) {
+      likeBuyButton.textContent = 'Unlike';
+      likeBuyButton.classList.remove('btn-primary');
+      likeBuyButton.classList.add('btn-danger');
+    } else {
+      likeBuyButton.textContent = 'Like';
+      likeBuyButton.classList.remove('btn-danger');
+      likeBuyButton.classList.add('btn-primary');
+    }
+    post_to_url("/suggestion/buyLike",{buySuggestionId:buySuggestionId,buyLiked:buyLiked},"POST");
+
+}
+
+function toggleSellLike(sellSuggestionId,sellLiked) {
+    const likeSellButton = document.getElementById('likeSellButton');
+    sellLiked = !sellLiked;
+
+    if (sellLiked) {
+      likeSellButton.textContent = 'Unlike';
+      likeSellButton.classList.remove('btn-primary');
+      likeSellButton.classList.add('btn-danger');
+    } else {
+      likeSellButton.textContent = 'Like';
+      likeSellButton.classList.remove('btn-danger');
+      likeSellButton.classList.add('btn-primary');
+    }
+    post_to_url("/suggestion/sellLike",{sellSuggestionId:sellSuggestionId,sellLiked:sellLiked},"POST")
+
+    }
+
+    function post_to_url(path, params, method) {
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+
+        for(var key in params) {
+            if(params.hasOwnProperty(key)) {
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", key);
+                hiddenField.setAttribute("value", params[key]);
+
+                form.appendChild(hiddenField);
+             }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        form.reset();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
 </body>
 </html>

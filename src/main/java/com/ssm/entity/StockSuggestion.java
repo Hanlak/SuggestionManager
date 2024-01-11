@@ -31,6 +31,9 @@ public class StockSuggestion {
     @Column(name = "stock_name", nullable = false)
     private String stockName;
 
+    @Column(name = "Likes", nullable = false)
+    private int noOfLikes = 0;
+
     @UpdateTimestamp
     @Temporal(TemporalType.DATE)
     @Column(name = "lastUpdated", nullable = false)
