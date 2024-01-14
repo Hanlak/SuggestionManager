@@ -1,6 +1,7 @@
 package com.ssm.controller;
 
 import com.ssm.entity.GroupRequest;
+import com.ssm.entity.UserGroup;
 import com.ssm.exception.GroupRequestException;
 import com.ssm.exception.UserAlreadyExistsException;
 import com.ssm.exception.UserNotFoundException;
@@ -97,4 +98,5 @@ public class GroupController {
             return modelAndView;
         }
     }
+
 }

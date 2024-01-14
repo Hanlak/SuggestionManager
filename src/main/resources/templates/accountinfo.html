@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Account Info</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <div th:replace="/mainnavbar :: mainnavbar"></div>
+</div>
+<div class="container mt-5">
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <h2>Account Information</h2>
+    <h5>FullName</h5>
+    <div id="parentFullName">
+        <div id="nameSection">
+            <p id="name" th:text="${accountInfo.name}"></p>
+            <button id="editFullName" class="btn btn-primary btn-sm" th:onclick="editFullName()">Edit Name</button>
+        </div>
+        <div id="editNameSection" style="display: none;">
+            <input type="text" id="editNameInput" class="form-control" th:value="${accountInfo.name}">
+            <button id="submitEditFullName" class="btn btn-success btn-sm" th:onclick="submitEditFullName()">Submit
+            </button>
+            <button id="cancelEditFullName" class="btn btn-secondary btn-sm" th:onclick="cancelEditFullName()">Cancel
+            </button>
+        </div>
+    </div>
+    <h5>Email</h5>
+    <div id="parentEmail">
+        <div id="emailSection">
+            <p id="email" th:text="${accountInfo.email}"></p>
+            <button id="editEmail" class="btn btn-primary btn-sm" th:onclick="editEmail()">Edit Email</button>
+        </div>
+        <div id="editEmailSection" style="display: none;">
+            <input type="text" id="editEmailInput" class="form-control" th:value="${accountInfo.email}">
+            <button id="submitEditEmail" class="btn btn-success btn-sm" th:onclick="submitEditEmail()">Submit
+            </button>
+            <button id="cancelEditEmail" class="btn btn-secondary btn-sm" th:onclick="cancelEditEmail()">Cancel
+            </button>
+        </div>
+    </div>
+    <h5>Update Password</h5>
+    <div id="parentPassword">
+        <div id="passwordSection">
+            <label>Current Password</label>
+            <input type="text" id="currentPassword" name="currentPassword" class="form-control">
+            <label>New Password</label>
+            <input type="text" id="newPassword" name="newPassword" class="form-control">
+            <button id="submitPassword" class="btn btn-success btn-sm" th:onclick="submitPassword()">Submit
+            </button>
+        </div>
+    </div>
+</div>
+</div>
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-Je4mDv3F6O0MKqr+q6t5ldy/DZwz27b1efwx5K/kD5XJc/2aKpr5K9CK6Z5vT5M5"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
+        crossorigin="anonymous"></script>
+<script th:inline="javascript">
+
+//EDITING FULL NAME
+ function editFullName() {
+        document.getElementById('nameSection').style.display = 'none';
+        document.getElementById('editNameSection').style.display = 'block';
+        console.log("in edit full name");
+    }
+//EDITING EMAIL
+    function editEmail() {
+        document.getElementById('emailSection').style.display = 'none';
+        document.getElementById('editEmailSection').style.display = 'block';
+        console.log("in edit email");
+    }
+
+//SUBMIT EDITING FULL NAME
+    function submitEditFullName() {
+        var editedName = document.getElementById('editNameInput').value;
+        document.getElementById('name').innerText = editedName;
+        document.getElementById('nameSection').style.display = 'block';
+        document.getElementById('editNameSection').style.display = 'none';
+        console.log(editedName);
+        post_to_url("/editFullName",{fullName:editedName},"POST");
+    }
+//SUBMIT EDITING EMAIL
+    function submitEditEmail() {
+        var editedName = document.getElementById('editEmailInput').value;
+        document.getElementById('email').innerText = editedName;
+        document.getElementById('emailSection').style.display = 'block';
+        document.getElementById('ediEmailSection').style.display = 'none';
+        console.log(editedEmail);
+        post_to_url("/editEmail",{fullName:editedEmail},"POST");
+    }
+
+//SUBMIT CURRENT PASSWORD:
+
+function submitPass(){
+var currentPass = document.getElementById('currentPassword').value;
+var newPass = document.getElementById('newPass').value;
+post_to_url("/editPass",{currentPass:currentPass,newPass:newPass},"POST");
+}
+
+//CANCEL FULL NAME EDIT
+function cancelEditFullName() {
+        document.getElementById('nameSection').style.display = 'block';
+        document.getElementById('editNameSection').style.display = 'none';
+                console.log("in cancel edit  full name");
+}
+//CANCEL EMAIL EDIT
+ function cancelEditEmail() {
+        document.getElementById('emailSection').style.display = 'block';
+        document.getElementById('editEmailSection').style.display = 'none';
+                console.log("in cancel edit email");
+}
+ function post_to_url(path, params, method) {
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+
+        for(var key in params) {
+            if(params.hasOwnProperty(key)) {
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", key);
+                hiddenField.setAttribute("value", params[key]);
+
+                form.appendChild(hiddenField);
+             }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        form.reset();
+    }
+
+
+
+
+
+
+
+
+</script>
+</body>
+</html>

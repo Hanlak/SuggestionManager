@@ -14,6 +14,7 @@ import org.springframework.util.ObjectUtils;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -116,16 +117,6 @@ public class GroupService {
             if (userName.equals(userGroup.get().getAdmin().getUserName())) {
                 groupRepository.deleteById(userGroup.get().getId());
                 groupRequestRepository.deleteByUserGroup(userGroup.get());
-//                //if there are no users then delete the entire group to release the group-name
-//                if (userGroup.get().getUsers().isEmpty()) {
-//                    groupRepository.deleteById(userGroup.get().getId());
-//                    groupRequestRepository.deleteByUserGroup(userGroup.get());
-//                } else {
-//                    User newAdmin = userGroup.get().getUsers().stream().findAny().orElse(null);
-//                    if (!ObjectUtils.isEmpty(newAdmin)) {
-//                        groupRepository.removeUserFromGroup(newAdmin, userGroup.get());
-//                    }
-//                }
             } else {
                 User member = userGroup.get().getUsers().stream()
                         .filter(user -> user.getUserName().equals(userName))
@@ -147,6 +138,36 @@ public class GroupService {
         //Check for admin
 
     }
+
+    /**
+     * REMOVE Member
+     */
+
+    public void removeMember(String groupName, String currentUser, String member) throws GroupNotFoundException, AccessException, UserNotFoundException {
+        Optional<UserGroup> userGroup = groupRepository.findByGroupName(groupName);
+
+        if (userGroup.isPresent()) {
+            if (!currentUser.equals(userGroup.get().getAdmin().getUserName())) {
+                throw new AccessException("Only Admin Can remove the Members of the Group");
+            } else {
+                User removeMember = userGroup.get().getUsers().stream()
+                        .filter(user -> user.getUserName().equals(member))
+                        .findFirst().orElse(null);
+                if (!ObjectUtils.isEmpty(removeMember)) {
+                    userGroup.get().removeUser(removeMember);
+                    removeMember.removeFromUserGroups(userGroup.get());
+                    userRepository.save(removeMember);
+                    groupRepository.save(userGroup.get());
+                    groupRequestRepository.deleteByUser(removeMember);
+                } else {
+                    throw new UserNotFoundException("Unable to find the member in" + userGroup.get().getGroupName());
+                }
+            }
+        } else {
+            throw new GroupNotFoundException("Group did not Exist to delete");
+        }
+    }
+
 
     public List<UserGroup> getAllGroupsBasedOnUser(String adminUser) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUserName(adminUser);
@@ -199,6 +220,13 @@ public class GroupService {
 
     public UserGroup getUserGroupBasedOnGroupId(Long groupId) throws GroupNotFoundException {
         return groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists"));
+    }
+
+    public Set<String> getMemberOfTheGroup(UserGroup userGroup) throws GroupNotFoundException {
+        UserGroup membersOfTheGroup = groupRepository.findByGroupName(userGroup.getGroupName()).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists Or Session Expired"));
+        Set<String> members = membersOfTheGroup.getUsers().stream().map(x -> x.getUserName()).collect(Collectors.toSet());
+        members.add(membersOfTheGroup.getAdmin().getUserName());
+        return members;
     }
 
 

@@ -22,6 +22,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/suggestion/")
@@ -173,6 +174,7 @@ public class SuggestionController {
         return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
     }
 
+
     @GetMapping("/deleteSuggestion/{id}")
     public String deleteSuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
         try {
@@ -218,7 +220,7 @@ public class SuggestionController {
         try {
             groupService.leaveGroup(userGroup.getGroupName(), principal.getName());
         } catch (GroupNotFoundException groupNotFoundException) {
-            redirectAttributes.addFlashAttribute("info", groupNotFoundException.getMessage());
+            redirectAttributes.addFlashAttribute("error", groupNotFoundException.getMessage());
             return "redirect:/index";
         } catch (DataAccessException dataAccessException) {
             redirectAttributes.addFlashAttribute("error", "Trouble While Performing Leave Action.Please Try Again");
@@ -228,6 +230,20 @@ public class SuggestionController {
             return "redirect:/index"; // should go to group Index
         }
         return "redirect:/index";
+    }
+
+    @GetMapping("/remove/{member}")
+    public String removeMemberFromGroup(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable("member") String member, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            groupService.removeMember(userGroup.getGroupName(), principal.getName(), member);
+        } catch (GroupNotFoundException | AccessException | UserNotFoundException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+            return "redirect:/suggestion/showMembers";
+        } catch (DataAccessException dataAccessException) {
+            redirectAttributes.addFlashAttribute("error", "Trouble While Performing Remove Action.Please Try Again");
+            return "redirect:/suggestion/showMembers";
+        }
+        return "redirect:/suggestion/showMembers";
     }
 
     @PostMapping("/buyLike")
@@ -246,5 +262,23 @@ public class SuggestionController {
         System.out.println(sellSuggestionId + "" + sellLiked);
         return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
     }
+
+    @GetMapping("/showMembers")
+    public String showMembers(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal, Model model) {
+        model.addAttribute("groupName", userGroup.getGroupName());
+        boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
+        model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
+        model.addAttribute("isAdmin", isAdmin);
+        try {
+            Set<String> members = groupService.getMemberOfTheGroup(userGroup);
+            model.addAttribute("members", members);
+            return "showmembers";
+        } catch (GroupNotFoundException | DataAccessException exception) {
+            model.addAttribute("error", exception.getMessage());
+            return "showmembers";
+        }
+
+    }
+
 
 }
