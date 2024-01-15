@@ -105,10 +105,7 @@ public class SuggestionService {
         suggestionRepository.save(sellSuggestion);
     }
 
-    public void deleteSuggestion(UserGroup userGroup, Long id) throws SuggestionNotFoundException, DataAccessException, GroupSessionException {
-        if (ObjectUtils.isEmpty(userGroup)) {
-            throw new GroupSessionException("Group Session Expired.Please Re-login again");
-        }
+    public void deleteSuggestion(UserGroup userGroup, Long id) throws SuggestionNotFoundException, DataAccessException {
         suggestionRepository.deleteById(id);
         likesRepository.deleteBySuggestionId(id);
     }

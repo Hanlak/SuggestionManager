@@ -16,7 +16,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
@@ -69,7 +68,9 @@ public class SuggestionController {
 
     //TODO: PREVENT DIRECT ACCESS TO THIS URL;
     @GetMapping("/suggestionForm")
-    public String showSuggestionForm(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal, Model model) {
+    public String showSuggestionForm(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, Principal principal, Model model) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         model.addAttribute("userGroup", userGroup);
         boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
         model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
@@ -85,7 +86,9 @@ public class SuggestionController {
     }
 
     @PostMapping("/submitBuy")
-    public String submitBuy(@SessionAttribute("userGroup") UserGroup userGroup, @ModelAttribute("buySuggestion") BuySuggestionDTO buySuggestionDTO, RedirectAttributes redirectAttributes) {
+    public String submitBuy(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @ModelAttribute("buySuggestion") BuySuggestionDTO buySuggestionDTO, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             suggestionService.addBuySuggestion(userGroup, buySuggestionDTO);
             return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
@@ -98,8 +101,9 @@ public class SuggestionController {
     }
 
     @PostMapping("/submitSell")
-    public String submitSell(@SessionAttribute("userGroup") UserGroup userGroup, @ModelAttribute("sellSuggestion") SellSuggestionDTO sellSuggestionDTO, RedirectAttributes redirectAttributes) {
-        // Handle SellSuggestion submission
+    public String submitSell(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @ModelAttribute("sellSuggestion") SellSuggestionDTO sellSuggestionDTO, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             suggestionService.addSellSuggestion(userGroup, sellSuggestionDTO);
             return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
@@ -113,7 +117,9 @@ public class SuggestionController {
     }
 
     @GetMapping("/editBuySuggestion/{id}")
-    public String showEditBuySuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditBuySuggestion(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             if (ObjectUtils.isEmpty(userGroup))
                 throw new GroupSessionException("Group Session Expired.Please Re-Login again");
@@ -134,10 +140,10 @@ public class SuggestionController {
     }
 
     @GetMapping("/editSellSuggestion/{id}")
-    public String showEditSellSuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditSellSuggestion(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
-            if (ObjectUtils.isEmpty(userGroup))
-                throw new GroupSessionException("Group Session Expired.Please Re-Login again");
             SellSuggestion sellSuggestion = suggestionService.getSellSuggestionById(id);
             model.addAttribute("id", id);
             model.addAttribute("priorities", priorities);
@@ -148,14 +154,14 @@ public class SuggestionController {
         } catch (DataAccessException e) {
             redirectAttributes.addFlashAttribute("error", "System Error: while Accessing the data");
             return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
-        } catch (GroupSessionException groupSessionException) {
-            return "redirect:/logout?groupSessionExpired";
         }
         return "editsellsuggestion";
     }
 
     @PostMapping("/editBuySuggestion")
-    public String updateBuySuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("id") Long id, @ModelAttribute("buySuggestion") BuySuggestionDTO buySuggestionDTO, Principal principal, RedirectAttributes redirectAttributes) {
+    public String updateBuySuggestion(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @RequestParam("id") Long id, @ModelAttribute("buySuggestion") BuySuggestionDTO buySuggestionDTO, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             suggestionService.updateBuySuggestion(userGroup, id, buySuggestionDTO);
         } catch (SuggestionNotFoundException | DataAccessException e) {
@@ -169,7 +175,9 @@ public class SuggestionController {
     }
 
     @PostMapping("/editSellSuggestion")
-    public String updateSellSuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("id") Long id, @ModelAttribute("SellSuggestionDTO") SellSuggestionDTO sellSuggestionDTO, Principal principal, RedirectAttributes redirectAttributes) {
+    public String updateSellSuggestion(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @RequestParam("id") Long id, @ModelAttribute("SellSuggestionDTO") SellSuggestionDTO sellSuggestionDTO, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             suggestionService.updateSellSuggestion(userGroup, id, sellSuggestionDTO);
         } catch (SuggestionNotFoundException | DataAccessException e) {
@@ -183,14 +191,14 @@ public class SuggestionController {
 
 
     @GetMapping("/deleteSuggestion/{id}")
-    public String deleteSuggestion(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
+    public String deleteSuggestion(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @PathVariable Long id, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             suggestionService.deleteSuggestion(userGroup, id);
         } catch (SuggestionNotFoundException | DataAccessException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
-        } catch (GroupSessionException groupSessionException) {
-            return "redirect:/logout?groupSessionExpired";
         }
         return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
 
@@ -198,16 +206,19 @@ public class SuggestionController {
 
     //TODO: session expiry exception handling;;
     @GetMapping("/deleteGroup")
-    public ModelAndView deleteGroup(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal) {
-        ModelAndView modelAndView = new ModelAndView("deletegroup");
-        modelAndView.addObject("username", principal.getName());
-        modelAndView.addObject("groupName", userGroup.getGroupName());
-        return modelAndView;
+    public String deleteGroup(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, Principal principal, Model model) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
+        model.addAttribute("username", principal.getName());
+        model.addAttribute("groupName", userGroup.getGroupName());
+        return "deletegroup";
     }
 
 
     @PostMapping("/deleteGroup")
-    public String deleteGroup(@RequestParam("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
+    public String deleteGroup(@RequestParam(value = "userGroup", required = false) String groupName, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(groupName))
+            return "redirect:/logout?groupSessionExpired";
         try {
             groupService.deleteGroup(groupName, principal.getName());
             redirectAttributes.addFlashAttribute("info", "Group Deleted Successfully");
@@ -223,7 +234,9 @@ public class SuggestionController {
 
 
     @GetMapping("/leaveGroup")
-    public String leaveGroup(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal, RedirectAttributes redirectAttributes) {
+    public String leaveGroup(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             groupService.leaveGroup(userGroup.getGroupName(), principal.getName());
         } catch (GroupNotFoundException groupNotFoundException) {
@@ -240,7 +253,9 @@ public class SuggestionController {
     }
 
     @GetMapping("/remove/{member}")
-    public String removeMemberFromGroup(@SessionAttribute("userGroup") UserGroup userGroup, @PathVariable("member") String member, Principal principal, RedirectAttributes redirectAttributes) {
+    public String removeMemberFromGroup(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @PathVariable("member") String member, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             groupService.removeMember(userGroup.getGroupName(), principal.getName(), member);
         } catch (GroupNotFoundException | AccessException | UserNotFoundException exception) {
@@ -254,7 +269,9 @@ public class SuggestionController {
     }
 
     @PostMapping("/buyLike")
-    public String buyLike(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("buySuggestionId") Long buySuggestionId, @RequestParam("buyLiked") boolean buyLiked, Principal principal, RedirectAttributes redirectAttributes) {
+    public String buyLike(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @RequestParam("buySuggestionId") Long buySuggestionId, @RequestParam("buyLiked") boolean buyLiked, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             suggestionService.likeBuySuggestion(buySuggestionId, buyLiked, principal.getName());
         } catch (SuggestionNotFoundException | UserNotFoundException | LikesException e) {
@@ -265,7 +282,9 @@ public class SuggestionController {
     }
 
     @PostMapping("/sellLike")
-    public String sellLike(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("sellSuggestionId") Long sellSuggestionId, @RequestParam("sellLiked") boolean sellLiked, Principal principal, RedirectAttributes redirectAttributes) {
+    public String sellLike(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, @RequestParam("sellSuggestionId") Long sellSuggestionId, @RequestParam("sellLiked") boolean sellLiked, Principal principal, RedirectAttributes redirectAttributes) {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         try {
             suggestionService.likeSellSuggestion(sellSuggestionId, sellLiked, principal.getName());
         } catch (SuggestionNotFoundException | UserNotFoundException | LikesException e) {
@@ -276,7 +295,9 @@ public class SuggestionController {
     }
 
     @GetMapping("/showMembers")
-    public String showMembers(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal, Model model) {
+    public String showMembers(@SessionAttribute(value = "userGroup", required = false) UserGroup userGroup, Principal principal, Model model) throws GroupSessionException {
+        if (ObjectUtils.isEmpty(userGroup))
+            return "redirect:/logout?groupSessionExpired";
         model.addAttribute("groupName", userGroup.getGroupName());
         boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
         model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
@@ -289,8 +310,5 @@ public class SuggestionController {
             model.addAttribute("error", exception.getMessage());
             return "showmembers";
         }
-
     }
-
-
 }
