@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SuggestionService {
@@ -231,23 +232,31 @@ public class SuggestionService {
     public List<BuyLikeSuggestionDTO> getBuyLikeSuggestions(String username) throws UserNotFoundException, LikesException {
         List<BuySuggestion> buySuggestionList = getBuySuggestions();
         Map<Long, Boolean> suggestionLikeBasedOnUser = userSuggestionChoice(username);
-        List<BuyLikeSuggestionDTO> buyLikeSuggestionDTOS = new ArrayList<>();
-        for (BuySuggestion buySuggestion : buySuggestionList) {
-            BuyLikeSuggestionDTO buyLikeSuggestionDTO = buyLikeSuggestionMapper.fromBuySuggestionAndChoice(buySuggestion, suggestionLikeBasedOnUser.getOrDefault(buySuggestion.getId(), false), buySuggestion.getId());
-            buyLikeSuggestionDTOS.add(buyLikeSuggestionDTO);
-        }
-        return buyLikeSuggestionDTOS;
+        return buySuggestionList.stream()
+                .map(buySuggestion -> buyLikeSuggestionMapper.fromBuySuggestionAndChoice(
+                        buySuggestion,
+                        suggestionLikeBasedOnUser.getOrDefault(buySuggestion.getId(), false),
+                        buySuggestion.getId()
+                ))
+                .sorted(Comparator
+                        .comparing((BuyLikeSuggestionDTO dto) -> dto.getBuyPriority().equals("High") ? 0 : 1) //High priority first and then likes and low
+                        .thenComparing(BuySuggestionDTO::getNoOfLikes))
+                .collect(Collectors.toList());
     }
 
     public List<SellLikeSuggestionDTO> getSellLikeSuggestions(String username) throws UserNotFoundException, LikesException {
         List<SellSuggestion> sellSuggestionList = getSellSuggestions();
         Map<Long, Boolean> suggestionLikeBasedOnUser = userSuggestionChoice(username);
-        List<SellLikeSuggestionDTO> sellLikeSuggestionDTOS = new ArrayList<>();
-        for (SellSuggestion sellSuggestion : sellSuggestionList) {
-            SellLikeSuggestionDTO sellLikeSuggestionDTO = sellLikeSuggestionMapper.fromSellSuggestionAndChoice(sellSuggestion, suggestionLikeBasedOnUser.getOrDefault(sellSuggestion.getId(), false), sellSuggestion.getId());
-            sellLikeSuggestionDTOS.add(sellLikeSuggestionDTO);
-        }
-        return sellLikeSuggestionDTOS;
+        return sellSuggestionList.stream()
+                .map(sellSuggestion -> sellLikeSuggestionMapper.fromSellSuggestionAndChoice(
+                        sellSuggestion,
+                        suggestionLikeBasedOnUser.getOrDefault(sellSuggestion.getId(), false),
+                        sellSuggestion.getId()
+                ))
+                .sorted(Comparator
+                        .comparing((SellSuggestionDTO dto) -> dto.getSellPriority().equals("High") ? 0 : 1) //High priority first and then likes and low
+                        .thenComparing(SellSuggestionDTO::getNoOfLikes))
+                .collect(Collectors.toList());
     }
 
 
