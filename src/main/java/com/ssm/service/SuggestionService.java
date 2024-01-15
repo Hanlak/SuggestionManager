@@ -171,9 +171,47 @@ public class SuggestionService {
         }
     }
 
+    public void likeSellSuggestion(Long sellSuggestionId, boolean isLiked, String username) throws SuggestionNotFoundException, UserNotFoundException, DataAccessException, LikesException {
+        SellSuggestion sellSuggestion = getSellSuggestionById(sellSuggestionId);
+        int noOfLikes = sellSuggestion.getNoOfLikes();
+        if (isLiked) {
+            noOfLikes += 1;
+        } else {
+            if (noOfLikes != 0) {
+                noOfLikes -= 1;
+            }
+        }
+        sellSuggestion.setNoOfLikes(noOfLikes);
+        //update the table that has info about which user liked or unliked a suggestion;
+        User user = userRepository.findByUserName(username).orElse(null);
+        if (ObjectUtils.isEmpty(user))
+            throw new UserNotFoundException("User Session Error In LikeSell Suggestion. Please Login again");
+        Optional<Likes> checkLiked = likesRepository.findByUserAndSuggestion(user, sellSuggestion);
+        // if a like by user and suggestion is already there and then just update the status of the liked state
+        if (checkLiked.isPresent()) {
+            if (checkLiked.get().isLiked() != isLiked) {
+                checkLiked.get().setLiked(isLiked);
+                likesRepository.save(checkLiked.get());
+                sellSuggestionRepository.save(sellSuggestion);
+            }
+        } else {
+            Likes sellLikes = mapSellLikeSuggestion(sellSuggestion, user, isLiked);
+            likesRepository.save(sellLikes);
+            sellSuggestionRepository.save(sellSuggestion);
+        }
+    }
+
     private Likes mapBuyLikeSuggestion(BuySuggestion buySuggestion, User user, boolean isLiked) {
         Likes likes = new Likes();
         likes.setSuggestion(buySuggestion);
+        likes.setUser(user);
+        likes.setLiked(isLiked);
+        return likes;
+    }
+
+    private Likes mapSellLikeSuggestion(SellSuggestion sellSuggestion, User user, boolean isLiked) {
+        Likes likes = new Likes();
+        likes.setSuggestion(sellSuggestion);
         likes.setUser(user);
         likes.setLiked(isLiked);
         return likes;

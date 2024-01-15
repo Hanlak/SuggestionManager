@@ -142,7 +142,7 @@ function toggleSellLike(sellSuggestionId,sellLiked) {
       likeSellButton.classList.remove('btn-danger');
       likeSellButton.classList.add('btn-primary');
     }
-    post_to_url("/suggestion/sellLike",{sellSuggestionId:sellSuggestionId,sellLiked:sellLiked},"POST")
+    post_to_url("/suggestion/sellLike",{sellSuggestionId:sellSuggestionId,sellLiked:sellLiked},"POST");
 
     }
 

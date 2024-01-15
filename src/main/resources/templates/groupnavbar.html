@@ -12,10 +12,6 @@
   		color: #4169E1;
   	}
 
-
-
-
-
         </style>
     </head>
     <body>
@@ -25,11 +21,14 @@
                 <a class="navbar-brand" href="/index">STOCK SUGGESTION MANAGER</a>
             </div>
             <ul class="nav navbar-nav">
-                <li><a href="/suggestion/suggestionForm">Add Suggestion</a></li>
+                <li th:if="${isAdmin}"><a href="/suggestion/suggestionForm">Add Suggestion</a></li>
                 <li><a href="/suggestion/leaveGroup">Leave Group</a></li>
-                <li><a href="/suggestion/deleteGroup">Delete group</a></li>
+                <li th:if="${isAdmin}"><a href="/suggestion/deleteGroup">Delete group</a></li>
                 <li><a href="/suggestion/showMembers">Show Members</a></li>
-                <li><a href="/suggestion/groupIndex">Group: <span th:text="${groupName}"></span></a></li>
+                <li>
+                    <a th:href="'/suggestion/groupIndex/' +${userGroup.id} + '/' + ${groupName}">Group: <span th:text="${groupName}"></span>
+                    </a>
+                </li>
             </ul>
         </div>
     </nav>

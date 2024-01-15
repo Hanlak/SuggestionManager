@@ -69,7 +69,11 @@ public class SuggestionController {
 
     //TODO: PREVENT DIRECT ACCESS TO THIS URL;
     @GetMapping("/suggestionForm")
-    public String showSuggestionForm(@SessionAttribute("userGroup") UserGroup userGroup, Model model) {
+    public String showSuggestionForm(@SessionAttribute("userGroup") UserGroup userGroup, Principal principal, Model model) {
+        model.addAttribute("userGroup", userGroup);
+        boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
+        model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
+        model.addAttribute("isAdmin", isAdmin);
         try {
             if (ObjectUtils.isEmpty(userGroup))
                 throw new GroupSessionException("Group Session Expired.Please Re-Login again");
@@ -251,18 +255,23 @@ public class SuggestionController {
 
     @PostMapping("/buyLike")
     public String buyLike(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("buySuggestionId") Long buySuggestionId, @RequestParam("buyLiked") boolean buyLiked, Principal principal, RedirectAttributes redirectAttributes) {
-        System.out.println(buySuggestionId + "" + buyLiked);
         try {
             suggestionService.likeBuySuggestion(buySuggestionId, buyLiked, principal.getName());
         } catch (SuggestionNotFoundException | UserNotFoundException | LikesException e) {
-            throw new RuntimeException(e);
+            redirectAttributes.addFlashAttribute("error", "Something wrong happened while liking the suggestion");
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
         }
         return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
     }
 
     @PostMapping("/sellLike")
-    public String sellLike(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("sellSuggestionId") String sellSuggestionId, @RequestParam("sellLiked") boolean sellLiked, Principal principal, RedirectAttributes redirectAttributes) {
-        System.out.println(sellSuggestionId + "" + sellLiked);
+    public String sellLike(@SessionAttribute("userGroup") UserGroup userGroup, @RequestParam("sellSuggestionId") Long sellSuggestionId, @RequestParam("sellLiked") boolean sellLiked, Principal principal, RedirectAttributes redirectAttributes) {
+        try {
+            suggestionService.likeSellSuggestion(sellSuggestionId, sellLiked, principal.getName());
+        } catch (SuggestionNotFoundException | UserNotFoundException | LikesException e) {
+            redirectAttributes.addFlashAttribute("error", "Something wrong happened while liking the suggestion");
+            return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
+        }
         return "redirect:/suggestion/groupIndex/" + userGroup.getId() + "/" + userGroup.getGroupName();
     }
 
