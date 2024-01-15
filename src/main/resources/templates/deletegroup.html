@@ -20,6 +20,9 @@
         <div class="form-group">
             <label for="groupName">Group Name:</label>
             <input type="text" class="form-control form-control-sm" id="groupName" name="groupName"
+                   pattern="[a-zA-Z0-9_]*"
+                   title="Only alphanumeric characters and underscore are allowed"
+                   minlength="5" maxlength="14"
                    placeholder="reconfirm the group name to delete permanently"
                    required>
         </div>
@@ -38,6 +41,7 @@
             window.alert('Group Name does not match. Please reconfirm.');
         }
     });
+
 </script>
 </body>
 </html>

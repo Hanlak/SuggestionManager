@@ -20,7 +20,12 @@
         <div class="form-group form-control-md">
             <label for="stockName">stock Name:</label>
             <input type="text" class="form-control form-control-sm" id="stockName" name="stockName"
-                   th:value="${sellSuggestion.stockName}" required/>
+                   th:value="${sellSuggestion.stockName}"
+                   pattern="[a-zA-Z]+"
+                   title="Only alphabetical characters are allowed for the stock name"
+                   oninput="convertToUppercase(this)"
+                   placeholder="please enter the name of the stock"
+                   required/>
         </div>
         <div class="form-group form-control-md">
             <label for="sellPriority">Sell Priority:</label>
@@ -36,17 +41,26 @@
             <label for="warnSellLevel">Warn Sell Level:</label>
             <input type="text" class="form-control" id="warnSellLevel" name="warnSellLevel"
                    th:value="${sellSuggestion.warnSellLevel}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the warning level to sell off"
                    required/>
         </div>
         <div class="form-group form-control-md">
             <label for="dangerSellLevel">Danger Sell Level</label>
             <input type="text" class="form-control" id="dangerSellLevel" name="dangerSellLevel"
                    th:value="${sellSuggestion.dangerSellLevel}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the danger level to sell off"
                    required/>
         </div>
         <div class="form-group form-control-md">
             <label for="pso">PSO</label>
             <input type="text" class="form-control" id="pso" name="pso" th:value="${sellSuggestion.pso}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="How much Percentage of Shares Owned to Sell Off"
                    required/>
         </div>
         <button type="submit" class="btn btn-primary">update</button>

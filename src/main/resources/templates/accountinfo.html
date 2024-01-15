@@ -24,7 +24,10 @@
             <button id="editFullName" class="btn btn-primary btn-sm" th:onclick="editFullName()">Edit Name</button>
         </div>
         <div id="editNameSection" style="display: none;">
-            <input type="text" id="editNameInput" class="form-control" th:value="${accountInfo.name}">
+            <input type="text" id="editNameInput" class="form-control"
+                   th:value="${accountInfo.name}"
+                   pattern="^[a-zA-Z]+(?: [a-zA-Z]+)?$"
+                   title="Enter a valid name">
             <button id="submitEditFullName" class="btn btn-success btn-sm" th:onclick="submitEditFullName()">Submit
             </button>
             <button id="cancelEditFullName" class="btn btn-secondary btn-sm" th:onclick="cancelEditFullName()">Cancel
@@ -38,7 +41,9 @@
             <button id="editEmail" class="btn btn-primary btn-sm" th:onclick="editEmail()">Edit Email</button>
         </div>
         <div id="editEmailSection" style="display: none;">
-            <input type="text" id="editEmailInput" class="form-control" th:value="${accountInfo.email}">
+            <input type="text" id="editEmailInput" class="form-control" th:value="${accountInfo.email}"
+                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                   title="Enter a valid email address">
             <button id="submitEditEmail" class="btn btn-success btn-sm" th:onclick="submitEditEmail()">Submit
             </button>
             <button id="cancelEditEmail" class="btn btn-secondary btn-sm" th:onclick="cancelEditEmail()">Cancel
@@ -49,9 +54,17 @@
     <div id="parentPassword">
         <div id="passwordSection">
             <label>Current Password</label>
-            <input type="text" id="currentPassword" name="currentPassword" class="form-control">
+            <input type="text" id="currentPassword" name="currentPassword" class="form-control"
+                   pattern="^[a-zA-Z0-9!@#$%^&*()-_+=<>?]+$"
+                   title="Alphanumeric and special characters allowed (!@#$%^&*()-_+=<>?]+$)"
+                   minlength="8"
+                   placeholder="Enter your Current password">>
             <label>New Password</label>
-            <input type="text" id="newPassword" name="newPassword" class="form-control">
+            <input type="text" id="newPassword" name="newPassword" class="form-control"
+                   pattern="^[a-zA-Z0-9!@#$%^&*()-_+=<>?]+$"
+                   title="Alphanumeric and special characters allowed (!@#$%^&*()-_+=<>?]+$)"
+                   minlength="8"
+                   placeholder="Enter your New password">
             <button id="submitPassword" class="btn btn-success btn-sm" th:onclick="submitPassword()">Submit
             </button>
         </div>
@@ -142,6 +155,9 @@ function cancelEditFullName() {
         form.submit();
         form.reset();
     }
+
+
+
 
 
 

@@ -26,22 +26,34 @@
                         <div class="form-userGroup">
                             <label for="name">Name</label>
                             <input type="text" class="form-control" id="name" th:field="*{name}"
+                                   pattern="^[a-zA-Z]+(?: [a-zA-Z]+)?$"
+                                   title="Enter a valid name"
                                    placeholder="Enter your name" required autofocus>
                         </div>
                         <div class="form-userGroup">
                             <label for="username">Username</label>
                             <input type="text" class="form-control" id="username" th:field="*{username}"
+                                   pattern="[a-zA-Z0-9_]*"
+                                   title="Only alphanumeric characters and underscore are allowed"
+                                   minlength="5" maxlength="14"
                                    placeholder="Enter your username" required autofocus>
                         </div>
                         <div class="form-userGroup">
                             <label for="email">Email</label>
                             <input type="email" class="form-control" id="email" th:field="*{email}"
-                                   placeholder="Enter your email" required autofocus>
+                                   placeholder="Enter your email"
+                                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                                   title="Enter a valid email address"
+                                   required autofocus>
                         </div>
                         <div class="form-userGroup">
                             <label for="password">Password</label>
                             <input type="password" class="form-control" id="password" th:field="*{password}"
-                                   placeholder="Enter your password" required autofocus>
+                                   placeholder="Enter your password"
+                                   pattern="^[a-zA-Z0-9!@#$%^&*()-_+=<>?]+$"
+                                   title="Alphanumeric and special characters allowed (!@#$%^&*()-_+=<>?]+$)"
+                                   minlength="8"
+                                   required autofocus>
                         </div>
                         <button type="submit" class="btn btn-primary">Register</button>
                         <a href="login" class="btn btn-link">Already a Member? Login Here</a>

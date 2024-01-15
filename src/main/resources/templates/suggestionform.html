@@ -22,7 +22,7 @@
     <div class="dropdown mt-3">
         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown"
                 aria-haspopup="true" aria-expanded="false">
-            Select Form
+            Click Here For Form (Default: BUY)
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <button class="dropdown-item btn" id="select-buy">Buy</button>
@@ -34,7 +34,12 @@
     <form id="buy-form" th:action="@{/suggestion/submitBuy}" method="post">
         <div class="form-group mt-4">
             <label for="stockNameBuy">Stock Name</label>
-            <input type="text" class="form-control" id="stockNameBuy" name="stockName" required>
+            <input type="text" class="form-control" id="stockNameBuy" name="stockName"
+                   pattern="[a-zA-Z]+"
+                   title="Only alphabetical characters are allowed for the stock name"
+                   oninput="convertToUppercase(this)"
+                   placeholder="please enter the name of the stock"
+                   required>
         </div>
         <div class="form-group">
             <label for="priorityBuy">Priority</label>
@@ -45,23 +50,41 @@
         </div>
         <div class="form-group">
             <label for="minBuy">Min Buy</label>
-            <input type="text" class="form-control" id="minBuy" name="minBuy" required>
+            <input type="text" class="form-control" id="minBuy" name="minBuy"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the minimum price to buy the stock"
+                   required>
         </div>
         <div class="form-group">
             <label for="maxBuy">Max Buy</label>
-            <input type="text" class="form-control" id="maxBuy" name="maxBuy" required>
+            <input type="text" class="form-control" id="maxBuy" name="maxBuy"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the maximum price to buy the stock"
+                   required>
         </div>
         <div class="form-group">
             <label for="target">Target Price</label>
-            <input type="text" class="form-control" id="target" name="target" required>
+            <input type="text" class="form-control" id="target" name="target"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter target" required>
         </div>
         <div class="form-group">
             <label for="stopLoss">STOP LOSS</label>
-            <input type="text" class="form-control" id="stopLoss" name="stopLoss" required>
+            <input type="text" class="form-control" id="stopLoss" name="stopLoss"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter stop loss"
+                   required>
         </div>
         <div class="form-group">
             <label for="qbosBuy">QBOS</label>
-            <input type="text" class="form-control" id="qbosBuy" name="qbos" required>
+            <input type="text" class="form-control" id="qbosBuy" name="qbos"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="Quantity Based on SIP" required>
         </div>
         <!-- Add other fields for Buy form -->
         <button type="submit" class="btn btn-primary">Submit Buy</button>
@@ -71,7 +94,11 @@
     <form id="sell-form" th:action="@{/suggestion/submitSell}" method="post" style="display: none;">
         <div class="form-group mt-4">
             <label for="stockNameSell">Stock Name</label>
-            <input type="text" class="form-control" id="stockNameSell" name="stockName" required>
+            <input type="text" class="form-control" id="stockNameSell" name="stockName"
+                   pattern="[a-zA-Z]+"
+                   title="Only alphabetical characters are allowed for the stock name"
+                   oninput="convertToUppercase(this)"
+                   required>
         </div>
         <div class="form-group">
             <label for="prioritySell">Priority</label>
@@ -82,15 +109,26 @@
         </div>
         <div class="form-group">
             <label for="warnSellLevel">Warn Sell Level</label>
-            <input type="text" class="form-control" id="warnSellLevel" name="warnSellLevel" required>
+            <input type="text" class="form-control" id="warnSellLevel" name="warnSellLevel"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the warning level to sell off"
+                   required>
         </div>
         <div class="form-group">
             <label for="dangerSellLevel">Danger Sell Level</label>
-            <input type="text" class="form-control" id="dangerSellLevel" name="dangerSellLevel" required>
+            <input type="text" class="form-control" id="dangerSellLevel" name="dangerSellLevel"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the danger level to sell off"
+                   required>
         </div>
         <div class="form-group">
             <label for="psoSell">PSO</label>
-            <input type="text" class="form-control" id="psoSell" name="pso" required>
+            <input type="text" class="form-control" id="psoSell" name="pso"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="How much Percentage of Shares Owned to Sell Off" required>
         </div>
         <!-- Add other fields for Sell form -->
         <button type="submit" class="btn btn-primary">Submit Sell</button>
@@ -120,6 +158,20 @@
             $("#sell-form").show();
         });
     });
+function convertToUppercase(input) {
+    input.value = input.value.toUpperCase();
+}
+
+
+
+
+
+
+
+
+
+
+
 
 </script>
 
