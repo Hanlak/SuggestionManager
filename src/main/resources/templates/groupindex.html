@@ -53,10 +53,10 @@
 
 
                     <!-- Add Edit and Delete buttons here -->
-                    <a th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
+                    <a th:if="${isAdmin}" th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
                        class="btn btn-primary btn-sm">Edit</a>
                     <!-- Delete button with link to delete controller -->
-                    <a th:href="@{'/suggestion/deleteSuggestion/'+ ${buySuggestion.id}}"
+                    <a th:if="${isAdmin}" th:href="@{'/suggestion/deleteSuggestion/'+ ${buySuggestion.id}}"
                        class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
@@ -96,10 +96,10 @@
                        th:text="${sellSuggestion.likeState? 'Unlike' : 'Like'}"></a>
 
                     <!-- Add Edit and Delete buttons here -->
-                    <a th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"
+                    <a th:if="${isAdmin}" th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"
                        class="btn btn-primary btn-sm">Edit</a>
                     <!-- Delete button with link to delete controller -->
-                    <a th:href="@{'/suggestion/deleteSuggestion/'+ ${sellSuggestion.id}}"
+                    <a th:if="${isAdmin}" th:href="@{'/suggestion/deleteSuggestion/'+ ${sellSuggestion.id}}"
                        class="btn btn-danger btn-sm">Delete</a>
                 </td>
             </tr>
@@ -166,6 +166,9 @@ function toggleSellLike(sellSuggestionId,sellLiked) {
         form.submit();
         form.reset();
     }
+
+
+
 </script>
 </body>
 </html>

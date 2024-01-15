@@ -50,6 +50,9 @@ public class SuggestionController {
         try {
             UserGroup userGroup = groupService.getUserGroupBasedOnGroupId(groupId);
             model.addAttribute("userGroup", userGroup);
+            boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
+            model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
+            model.addAttribute("isAdmin", isAdmin);
             List<BuyLikeSuggestionDTO> buySuggestionList = suggestionService.getBuyLikeSuggestions(principal.getName());
             List<SellLikeSuggestionDTO> sellSuggestionList = suggestionService.getSellLikeSuggestions(principal.getName());
             model.addAttribute("buySuggestions", buySuggestionList);
