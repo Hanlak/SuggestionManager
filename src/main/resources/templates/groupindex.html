@@ -23,7 +23,7 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>ID</th>
+                <!--                <th>ID</th>-->
                 <th>Stock Name</th>
                 <th>Min Buy</th>
                 <th>Max Buy</th>
@@ -37,7 +37,7 @@
             <tbody id="buySuggestionsTable">
             <!-- Iterate over buySuggestionsList and populate table -->
             <tr th:each="buySuggestion : ${buySuggestions}">
-                <td th:text="${buySuggestion.id}"></td>
+                <!--                <td th:text="${buySuggestion.id}"></td>-->
                 <td th:text="${buySuggestion.stockName}"></td>
                 <td th:text="${buySuggestion.minBuy}"></td>
                 <td th:text="${buySuggestion.maxBuy}"></td>
@@ -70,7 +70,7 @@
         <table class="table table-bordered">
             <thead>
             <tr>
-                <th>ID</th>
+                <!--                <th>ID</th>-->
                 <th>Stock Name</th>
                 <th>Warn Sell Level</th>
                 <th>Danger Sell Level</th>
@@ -82,7 +82,7 @@
             <tbody id="sellSuggestionsTable">
             <!-- Iterate over sellSuggestions and populate table -->
             <tr th:each="sellSuggestion : ${sellSuggestions}">
-                <td th:text="${sellSuggestion.id}"></td>
+                <!--                <td th:text="${sellSuggestion.id}"></td>-->
                 <td th:text="${sellSuggestion.stockName}"></td>
                 <td th:text="${sellSuggestion.warnSellLevel}"></td>
                 <td th:text="${sellSuggestion.dangerSellLevel}"></td>
@@ -166,6 +166,7 @@ function toggleSellLike(sellSuggestionId,sellLiked) {
         form.submit();
         form.reset();
     }
+
 
 
 
