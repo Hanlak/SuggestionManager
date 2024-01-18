@@ -38,12 +38,22 @@
                     <form th:action="@{/login}" method="post">
                         <div class="form-userGroup">
                             <label for="username">Username</label>
-                            <input type="text" class="form-control" id="username" name="username"
+                            <input type="text" class="form-control"
+                                   id="username"
+                                   name="username"
+                                   pattern="[a-zA-Z0-9_]*"
+                                   title="Only alphanumeric characters and underscore are allowed"
+                                   minlength="5" maxlength="14"
                                    placeholder="Enter your username">
                         </div>
                         <div class="form-userGroup">
                             <label for="password">Password</label>
-                            <input type="password" class="form-control" id="password" name="password"
+                            <input type="password" class="form-control"
+                                   id="password"
+                                   name="password"
+                                   pattern="^[a-zA-Z0-9!@#$%^&*()\-_+=<>?]+$"
+                                   title="Alphanumeric and special characters allowed (!@#$%^&*()-_+=<>?]+$)"
+                                   minlength="8"
                                    placeholder="Enter your password">
                         </div>
                         <button type="submit" class="btn btn-primary">Login</button>

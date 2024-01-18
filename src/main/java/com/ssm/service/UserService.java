@@ -17,11 +17,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.singletonList;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -50,7 +52,7 @@ public class UserService implements UserDetailsService {
         checkUserOrEmailAlreadyExists(registerDTO);
         User user = new User(registerDTO.getName(), registerDTO.getUsername(),
                 registerDTO.getEmail(),
-                passwordEncoder.encode(registerDTO.getPassword()), Collections.singletonList(new Role("ROLE_USER")));
+                passwordEncoder.encode(registerDTO.getPassword()), singletonList(new Role("ROLE_USER")));
         return userRepository.save(user);
     }
 
@@ -77,6 +79,12 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    public RegisterDTO accountInformation(String username) throws UserNotFoundException {
+        User user = userRepository.findByUserName(username)
+                .orElseThrow(() -> new UserNotFoundException("User Session Might have Expired. Please Login again."));
+        return iUserMapper.toDto(user);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUserName(username);
@@ -85,6 +93,39 @@ public class UserService implements UserDetailsService {
         }
         return new org.springframework.security.core.userdetails.User(user.get().getUserName(), user.get().getPassword(), mapRolesToAuthorities(user.get().getRoles()));
 
+    }
+
+    public void updateFullName(String fullName, String username) throws UserNotFoundException, DataAccessException {
+        User user = userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User Not Found,Might be Session Issue; please login"));
+        if (!fullName.equals(user.getFullName())) {
+            user.setFullName(fullName);
+            userRepository.save(user);
+        }
+    }
+
+    public void updateEmail(String email, String username) throws UserNotFoundException, DataAccessException, EmailAlreadyExistsException {
+        User user = userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User Not Found,Might be Session Issue; please login"));
+        if (!email.equals(user.getEmail())) {
+            User emailCheck = userRepository.findByEmail(email).orElse(null);
+            if (ObjectUtils.isEmpty(emailCheck)) {
+                user.setEmail(email);
+                userRepository.save(user);
+            }else{
+                throw new EmailAlreadyExistsException("The given mail already registered with another account");
+            }
+        }
+    }
+
+    public void updatePass(String currentPass, String newPass, String username) throws UserNotFoundException, DataAccessException, PasswordUpdateException {
+        User user = userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User Not Found,Might be Session Issue; please login"));
+        if (!passwordEncoder.matches(currentPass,user.getPassword())) {
+            throw new PasswordUpdateException("Current Password is wrong,please use forgot password to create a new password and update here");
+        } else if (currentPass.equals(newPass)) {
+            throw new PasswordUpdateException("Password should not be same as old password");
+        } else {
+            user.setPassword(passwordEncoder.encode(newPass));
+            userRepository.save(user);
+        }
     }
 
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
@@ -99,4 +140,6 @@ public class UserService implements UserDetailsService {
         if (emailUser.isPresent())
             throw new UserAlreadyExistsException("email is already registered.Please try another email");
     }
+
+
 }

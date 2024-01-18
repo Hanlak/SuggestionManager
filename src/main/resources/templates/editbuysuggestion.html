@@ -20,7 +20,12 @@
         <div class="form-group form-control-md">
             <label for="stockName">stock Name:</label>
             <input type="text" class="form-control form-control-sm" id="stockName" name="stockName"
-                   th:value="${buySuggestion.stockName}" required/>
+                   th:value="${buySuggestion.stockName}"
+                   pattern="[a-zA-Z]+"
+                   title="Only alphabetical characters are allowed for the stock name"
+                   oninput="convertToUppercase(this)"
+                   placeholder="please enter the name of the stock"
+                   required/>
         </div>
         <div class="form-group form-control-md">
             <label for="buyPriority">Buy Priority:</label>
@@ -35,26 +40,42 @@
         <div class="form-group form-control-md">
             <label for="minBuy">Min Buy:</label>
             <input type="text" class="form-control" id="minBuy" name="minBuy" th:value="${buySuggestion.minBuy}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the minimum price to buy the stock"
                    required/>
         </div>
         <div class="form-group form-control-md">
             <label for="maxBuy">Max Buy:</label>
             <input type="text" class="form-control" id="maxBuy" name="maxBuy" th:value="${buySuggestion.maxBuy}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter the maximum price to buy the stock"
                    required/>
         </div>
         <div class="form-group form-control-md">
             <label for="targetPrice">Target Price:</label>
             <input type="text" class="form-control" id="targetPrice" name="target" th:value="${buySuggestion.target}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter target"
                    required/>
         </div>
         <div class="form-group form-control-md">
             <label for="stopLoss">Stop Loss:</label>
             <input type="text" class="form-control" id="stopLoss" name="stopLoss" th:value="${buySuggestion.stopLoss}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="please enter stop loss"
                    required/>
         </div>
         <div class="form-group form-control-md">
             <label for="qbos">Quantity Based on Suggestion:</label>
-            <input type="text" class="form-control" id="qbos" name="qbos" th:value="${buySuggestion.qbos}" required/>
+            <input type="text" class="form-control" id="qbos" name="qbos" th:value="${buySuggestion.qbos}"
+                   pattern="[0-9]+"
+                   title="Only numeric digits allowed"
+                   placeholder="Quantity Based on SIP"
+                   required/>
         </div>
         <button type="submit" class="btn btn-primary">update</button>
     </form>
@@ -69,5 +90,10 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
         integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
         crossorigin="anonymous"></script>
+<script>
+    function convertToUppercase(input) {
+    input.value = input.value.toUpperCase();
+}
+</script>
 </body>
 </html>

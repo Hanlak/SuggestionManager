@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Account Info</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <div th:replace="/mainnavbar :: mainnavbar"></div>
+</div>
+<div class="container mt-5">
+    <!-- Info and error messages for the entire form -->
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <h2>Account Information</h2>
+
+    <!-- FullName section -->
+    <h3>FullName</h3>
+    <div id="parentFullName">
+        <div id="nameSection">
+            <p id="name" th:text="${accountInfo.name}"></p>
+            <button id="editFullName" class="btn btn-primary btn-sm" onclick="editFullName()">Edit Name</button>
+        </div>
+        <div id="editNameSection" style="display: none;">
+            <input type="text" id="editNameInput" class="form-control"
+                   th:value="${accountInfo.name}"
+                   pattern="^[a-zA-Z]+(?: [a-zA-Z]+)?$"
+                   title="Enter a valid name">
+            <button id="submitEditFullName" class="btn btn-success btn-sm" onclick="submitEditFullName()">Submit
+            </button>
+            <button id="cancelEditFullName" class="btn btn-secondary btn-sm" onclick="cancelEditFullName()">Cancel
+            </button>
+            <!-- Info and error messages for FullName section -->
+            <div th:if="${infoFullName}" class="alert alert-info" role="alert" th:text="${infoFullName}"></div>
+            <div th:if="${errorFullName}" class="alert alert-danger" role="alert" th:text="${errorFullName}"></div>
+        </div>
+    </div>
+    <br/>
+    <!-- Email section -->
+    <h3>Email</h3>
+    <div id="parentEmail">
+        <div id="emailSection">
+            <p id="email" th:text="${accountInfo.email}"></p>
+            <button id="editEmail" class="btn btn-primary btn-sm" onclick="editEmail()">Edit Email</button>
+        </div>
+        <div id="editEmailSection" style="display: none;">
+            <input type="text" id="editEmailInput" class="form-control" th:value="${accountInfo.email}"
+                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                   title="Enter a valid email address">
+            <button id="submitEditEmail" class="btn btn-success btn-sm" onclick="submitEditEmail()">Submit</button>
+            <button id="cancelEditEmail" class="btn btn-secondary btn-sm" onclick="cancelEditEmail()">Cancel</button>
+            <!-- Info and error messages for Email section -->
+            <div th:if="${infoEmail}" class="alert alert-info" role="alert" th:text="${infoEmail}"></div>
+            <div th:if="${errorEmail}" class="alert alert-danger" role="alert" th:text="${errorEmail}"></div>
+        </div>
+    </div>
+    <br/>
+    <!-- Update Password section -->
+    <h3>Update Password</h3>
+    <div id="parentPassword">
+        <div id="passwordSection">
+            <label for="currentPassword">Current Password</label>
+            <input type="password" id="currentPassword" name="currentPassword" class="form-control"
+                   pattern="^[a-zA-Z0-9!@#$%^&*()\-_+=<>?]+$"
+                   title="Alphanumeric and special characters allowed (!@#$%^&*()-_+=<>?]+$)"
+                   minlength="8"
+                   placeholder="Enter your Current password">
+            <label for="newPassword">New Password</label>
+            <input type="password" id="newPassword" name="newPassword" class="form-control"
+                   pattern="^[a-zA-Z0-9!@#$%^&*()\-_+=<>?]+$"
+                   title="Alphanumeric and special characters allowed (!@#$%^&*()-_+=<>?]+$)"
+                   minlength="8"
+                   placeholder="Enter your New password">
+            <button id="submitPassword" class="btn btn-success btn-sm" onclick="submitPassword()">Submit</button>
+            <!-- Info and error messages for Password section -->
+            <div th:if="${infoPassword}" class="alert alert-info" role="alert" th:text="${infoPassword}"></div>
+            <div th:if="${errorPassword}" class="alert alert-danger" role="alert" th:text="${errorPassword}"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS and jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+        integrity="sha384-Je4mDv3F6O0MKqr+q6t5ldy/DZwz27b1efwx5K/kD5XJc/2aKpr5K9CK6Z5vT5M5"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em"
+        crossorigin="anonymous"></script>
+<script th:inline="javascript">
+
+    // JavaScript functions
+
+    function editFullName() {
+        document.getElementById('nameSection').style.display = 'none';
+        document.getElementById('editNameSection').style.display = 'block';
+        console.log("in edit full name");
+    }
+
+    function editEmail() {
+        document.getElementById('emailSection').style.display = 'none';
+        document.getElementById('editEmailSection').style.display = 'block';
+        console.log("in edit email");
+    }
+
+    function submitEditFullName() {
+        var editedName = document.getElementById('editNameInput').value;
+        document.getElementById('name').innerText = editedName;
+        document.getElementById('nameSection').style.display = 'block';
+        document.getElementById('editNameSection').style.display = 'none';
+        console.log(editedName);
+        post_to_url("/editFullName", {fullName: editedName}, "POST");
+    }
+
+    function submitEditEmail() {
+        var editedEmail = document.getElementById('editEmailInput').value;
+        document.getElementById('email').innerText = editedEmail;
+        document.getElementById('emailSection').style.display = 'block';
+        document.getElementById('editEmailSection').style.display = 'none';
+        console.log(editedEmail);
+        post_to_url("/editEmail", {email: editedEmail}, "POST");
+    }
+
+    function submitPassword() {
+        var currentPass = document.getElementById('currentPassword').value;
+        var newPass = document.getElementById('newPassword').value;
+        post_to_url("/editPass", {currentPass: currentPass, newPass: newPass}, "POST");
+    }
+
+    function cancelEditFullName() {
+        document.getElementById('nameSection').style.display = 'block';
+        document.getElementById('editNameSection').style.display = 'none';
+        console.log("in cancel edit full name");
+    }
+
+    function cancelEditEmail() {
+        document.getElementById('emailSection').style.display = 'block';
+        document.getElementById('editEmailSection').style.display = 'none';
+        console.log("in cancel edit email");
+    }
+
+    function post_to_url(path, params, method) {
+        var form = document.createElement("form");
+        form.setAttribute("method", method);
+        form.setAttribute("action", path);
+
+        for (var key in params) {
+            if (params.hasOwnProperty(key)) {
+                var hiddenField = document.createElement("input");
+                hiddenField.setAttribute("type", "hidden");
+                hiddenField.setAttribute("name", key);
+                hiddenField.setAttribute("value", params[key]);
+
+                form.appendChild(hiddenField);
+            }
+        }
+
+        document.body.appendChild(form);
+        form.submit();
+        form.reset();
+    }
+
+
+</script>
+</body>
+</html>

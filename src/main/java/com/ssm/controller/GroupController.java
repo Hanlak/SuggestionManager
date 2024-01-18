@@ -2,6 +2,7 @@ package com.ssm.controller;
 
 import com.ssm.entity.GroupRequest;
 import com.ssm.exception.GroupRequestException;
+import com.ssm.exception.PendingRequestException;
 import com.ssm.exception.UserAlreadyExistsException;
 import com.ssm.exception.UserNotFoundException;
 import com.ssm.service.GroupService;
@@ -27,8 +28,10 @@ public class GroupController {
 
 
     @GetMapping("/createGroup")
-    public String createGroup() {
-        return "creategroup";
+    public ModelAndView createGroup(Principal principal) {
+        ModelAndView modelAndView = new ModelAndView("creategroup");
+        modelAndView.addObject("username", principal.getName());
+        return modelAndView;
     }
 
     @PostMapping("/createGroup")
@@ -47,8 +50,10 @@ public class GroupController {
     }
 
     @GetMapping("/requestToJoinGroup")
-    public String requestToJoinGroup() {
-        return "joingroup";
+    public ModelAndView requestToJoinGroup(Principal principal) {
+        ModelAndView modelAndView = new ModelAndView("joingroup");
+        modelAndView.addObject("username", principal.getName());
+        return modelAndView;
     }
 
 
@@ -69,7 +74,7 @@ public class GroupController {
         } catch (UserNotFoundException | GroupRequestException customException) {
             redirectAttributes.addFlashAttribute("error", customException.getMessage());
             return "redirect:/groups/requestToJoinGroup";
-        } catch (UserAlreadyExistsException userAlreadyExistsException) {
+        } catch (UserAlreadyExistsException | PendingRequestException userAlreadyExistsException) {
             redirectAttributes.addFlashAttribute("info", userAlreadyExistsException.getMessage());
             return "redirect:/index";
         }
@@ -78,35 +83,10 @@ public class GroupController {
     }
 
 
-    @GetMapping("/deleteGroup")
-    public String deleteGroup() {
-        return "deletegroup";
-    }
-
-
-    @PostMapping("/deleteGroup")
-    public ModelAndView deleteGroup(@RequestParam("groupName") String groupName, Principal principal) {
-        ModelAndView modelAndView = new ModelAndView();
-        try {
-            groupService.deleteGroup(groupName, principal.getName());
-            modelAndView.addObject("info", "Group Deleted Successfully");
-            modelAndView.setViewName("index");
-            return modelAndView;
-        } catch (UserNotFoundException userNotFoundException) {
-            modelAndView.addObject("info", userNotFoundException.getMessage());
-            modelAndView.setViewName("index");
-            return modelAndView;
-        } catch (DataAccessException dataAccessException) {
-            modelAndView.addObject("error", "Trouble While Performing Delete Action.Please Try Again");
-            modelAndView.setViewName("index");
-            return modelAndView;
-        }
-    }
-
-
     @GetMapping("/displayRequests")
     public ModelAndView displayRequests(Principal principal) {
         ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("username", principal.getName());
         try {
             List<GroupRequest> pendingRequests = groupService.displayPendingRequests(principal.getName());
             modelAndView.addObject("pendingRequests", pendingRequests);
@@ -118,4 +98,5 @@ public class GroupController {
             return modelAndView;
         }
     }
+
 }

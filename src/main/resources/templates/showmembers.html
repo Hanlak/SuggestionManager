@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Index Page</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <div th:replace="/groupnavbar :: groupnavbar"></div>
+</div>
+<div class="container mt-4">
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <div id="memberTable">
+        <!-- Table for Buy Suggestions -->
+        <h1>Members</h1>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th>Member</th>
+                <th th:if="${isAdmin}">Action</th>
+            </tr>
+            </thead>
+            <tbody id="showMembersTable">
+            <tr th:each="member : ${members}">
+                <td>
+                    <span th:text="${member}"></span>
+                    <span th:if="${member == adminOfTheGroup}"> (admin)</span>
+                </td>
+                <td th:if="${isAdmin and member != adminOfTheGroup}">
+                    <a th:href="'/suggestion/remove/'+ ${member}" class="btn btn-primary btn-sm">remove</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

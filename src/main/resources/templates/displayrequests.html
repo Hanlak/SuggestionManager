@@ -31,8 +31,8 @@
             <td th:text="${request.user.userName}"></td>
             <td th:text="${request.userGroup.groupName}"></td>
             <td>
-                <a class="btn btn-success btn-sm" href="#" role="button">Accept</a>
-                <a class="btn btn-danger btn-sm" href="#" role="button">Reject</a>
+                <a class="btn btn-success btn-sm" th:href="@{'/request/'+ ${request.id} +'/ACCEPTED'}" role="button">Accept</a>
+                <a class="btn btn-danger btn-sm" th:href="@{'/request/'+ ${request.id} +'/REJECTED'}"  role="button">Reject</a>
             </td>
         </tr>
         </tbody>

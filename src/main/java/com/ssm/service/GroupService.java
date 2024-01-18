@@ -3,10 +3,7 @@ package com.ssm.service;
 import com.ssm.entity.GroupRequest;
 import com.ssm.entity.User;
 import com.ssm.entity.UserGroup;
-import com.ssm.exception.GroupNotFoundException;
-import com.ssm.exception.GroupRequestException;
-import com.ssm.exception.UserAlreadyExistsException;
-import com.ssm.exception.UserNotFoundException;
+import com.ssm.exception.*;
 import com.ssm.repository.GroupRepository;
 import com.ssm.repository.GroupRequestRepository;
 import com.ssm.repository.UserRepository;
@@ -15,8 +12,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class GroupService {
@@ -52,7 +49,7 @@ public class GroupService {
         groupRepository.save(userGroup);
     }
 
-    public Boolean sendRequestToJoinGroup(String groupName, String userName) throws DataAccessException, UserAlreadyExistsException, UserNotFoundException, GroupRequestException {
+    public Boolean sendRequestToJoinGroup(String groupName, String userName) throws DataAccessException, UserAlreadyExistsException, UserNotFoundException, GroupRequestException, PendingRequestException {
         Optional<User> user = userRepository.findByUserName(userName);
         Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
         if (user.isPresent() && group.isPresent()) { //check user and group present or not
@@ -71,9 +68,11 @@ public class GroupService {
                     if (groupRequest.get().getStatus().equals(GroupRequest.RequestStatus.REJECTED)) {
                         int savedState = groupRequestRepository.changeStatusToPending(GroupRequest.RequestStatus.PENDING, groupRequest.get().getId());
                         return savedState != 0;
+                    } else if (groupRequest.get().getStatus().equals(GroupRequest.RequestStatus.PENDING)) {
+                        throw new PendingRequestException("The Request Already Sent and Its in Pending state");
                     } else {
                         //TODO: HAVE TO DISCUSS ON THIS EXCEPTION
-                        throw new GroupRequestException("Error while Processing your Group Request: Please try again");
+                        throw new GroupRequestException("Try Checking With Admin or support about the request");
                     }
                 }
             }
@@ -94,7 +93,6 @@ public class GroupService {
     }
 
 
-    @Transactional
     public void deleteGroup(String groupName, String userName) throws DataAccessException, UserNotFoundException {
         Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
         if (group.isPresent()) {
@@ -108,6 +106,68 @@ public class GroupService {
             throw new UserNotFoundException("Group did not Exist to delete");
         }
     }
+
+    /**
+     * In the phase just deleting the group if admin leaves the group
+     * we will show a warning before leaving the group which means deleting the group
+     **/
+    public void leaveGroup(String groupName, String userName) throws LeaveGroupException, GroupNotFoundException {
+        Optional<UserGroup> userGroup = groupRepository.findByGroupName(groupName);
+        if (userGroup.isPresent()) {
+            if (userName.equals(userGroup.get().getAdmin().getUserName())) {
+                groupRepository.deleteById(userGroup.get().getId());
+                groupRequestRepository.deleteByUserGroup(userGroup.get());
+            } else {
+                User member = userGroup.get().getUsers().stream()
+                        .filter(user -> user.getUserName().equals(userName))
+                        .findFirst().orElse(null);
+                if (!ObjectUtils.isEmpty(member)) {
+                    userGroup.get().removeUser(member);
+                    member.removeFromUserGroups(userGroup.get());
+                    userRepository.save(member);
+                    groupRepository.save(userGroup.get());
+                    groupRequestRepository.deleteByUser(member);
+                } else {
+                    throw new LeaveGroupException("Unable to find the member in" + userGroup.get().getGroupName());
+                }
+            }
+        } else {
+            throw new GroupNotFoundException("Group did not Exist to delete");
+        }
+
+        //Check for admin
+
+    }
+
+    /**
+     * REMOVE Member
+     */
+
+    public void removeMember(String groupName, String currentUser, String member) throws GroupNotFoundException, AccessException, UserNotFoundException {
+        Optional<UserGroup> userGroup = groupRepository.findByGroupName(groupName);
+
+        if (userGroup.isPresent()) {
+            if (!currentUser.equals(userGroup.get().getAdmin().getUserName())) {
+                throw new AccessException("Only Admin Can remove the Members of the Group");
+            } else {
+                User removeMember = userGroup.get().getUsers().stream()
+                        .filter(user -> user.getUserName().equals(member))
+                        .findFirst().orElse(null);
+                if (!ObjectUtils.isEmpty(removeMember)) {
+                    userGroup.get().removeUser(removeMember);
+                    removeMember.removeFromUserGroups(userGroup.get());
+                    userRepository.save(removeMember);
+                    groupRepository.save(userGroup.get());
+                    groupRequestRepository.deleteByUser(removeMember);
+                } else {
+                    throw new UserNotFoundException("Unable to find the member in" + userGroup.get().getGroupName());
+                }
+            }
+        } else {
+            throw new GroupNotFoundException("Group did not Exist to delete");
+        }
+    }
+
 
     public List<UserGroup> getAllGroupsBasedOnUser(String adminUser) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUserName(adminUser);
@@ -127,14 +187,13 @@ public class GroupService {
         return pendingRequests;
     }
 
-    @Transactional
-    public Boolean requestStatusUpdate(String id, String status) {
-        Long groupId = Long.valueOf(id);
+
+    public Boolean requestStatusUpdate(Long groupRequestId, String status) {
         GroupRequest.RequestStatus requestStatus = "ACCEPTED".equals(status) ? GroupRequest.RequestStatus.ACCEPTED : GroupRequest.RequestStatus.REJECTED;
-        int savedState = groupRequestRepository.changeStatusToPending(requestStatus, groupId);
+        int savedState = groupRequestRepository.changeStatusToPending(requestStatus, groupRequestId);
         //add the user to the group
         if (savedState != 0 && "ACCEPTED".equals(status)) {
-            Optional<GroupRequest> groupRequest = groupRequestRepository.findById(groupId);
+            Optional<GroupRequest> groupRequest = groupRequestRepository.findById(groupRequestId);
             if (groupRequest.isPresent()) {
                 User user = groupRequest.get().getUser();
                 UserGroup userGroup = groupRequest.get().getUserGroup();
@@ -162,5 +221,13 @@ public class GroupService {
     public UserGroup getUserGroupBasedOnGroupId(Long groupId) throws GroupNotFoundException {
         return groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists"));
     }
+
+    public Set<String> getMemberOfTheGroup(UserGroup userGroup) throws GroupNotFoundException {
+        UserGroup membersOfTheGroup = groupRepository.findByGroupName(userGroup.getGroupName()).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists Or Session Expired"));
+        Set<String> members = membersOfTheGroup.getUsers().stream().map(x -> x.getUserName()).collect(Collectors.toSet());
+        members.add(membersOfTheGroup.getAdmin().getUserName());
+        return members;
+    }
+
 
 }

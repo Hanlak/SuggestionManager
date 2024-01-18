@@ -43,7 +43,7 @@ public class User {
 
     private Collection<Role> roles;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "users_groups",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
@@ -51,6 +51,11 @@ public class User {
     )
     private Set<UserGroup> userGroups = new HashSet<>();
 
+    // Method to remove a user from user groups
+    public void removeFromUserGroups(UserGroup userGroup) {
+        this.getUserGroups().remove(userGroup);
+        userGroup.getUsers().remove(this);
+    }
 
     public User(String fullName, String userName, String email, String password, Collection<Role> roles) {
         this.fullName = fullName;
