@@ -216,9 +216,7 @@ public class SuggestionController {
 
 
     @PostMapping("/deleteGroup")
-    public String deleteGroup(@RequestParam(value = "userGroup", required = false) String groupName, Principal principal, RedirectAttributes redirectAttributes) {
-        if (ObjectUtils.isEmpty(groupName))
-            return "redirect:/logout?groupSessionExpired";
+    public String deleteGroup(@RequestParam("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
         try {
             groupService.deleteGroup(groupName, principal.getName());
             redirectAttributes.addFlashAttribute("info", "Group Deleted Successfully");
