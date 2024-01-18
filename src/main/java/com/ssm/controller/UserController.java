@@ -1,10 +1,7 @@
 package com.ssm.controller;
 
 import com.ssm.dto.RegisterDTO;
-import com.ssm.exception.EmailMismatchException;
-import com.ssm.exception.EmailSendingException;
-import com.ssm.exception.PasswordUpdateException;
-import com.ssm.exception.UserNotFoundException;
+import com.ssm.exception.*;
 import com.ssm.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -76,10 +73,10 @@ public class UserController {
         try {
             userService.updateFullName(name, principal.getName());
             redirectAttributes.addFlashAttribute("username", principal.getName());
-            redirectAttributes.addFlashAttribute("Successfully Updated FullName");
+            redirectAttributes.addFlashAttribute("infoFullName", "Successfully Updated FullName");
             return "redirect:/accountInformation";
         } catch (UserNotFoundException | DataAccessException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorFullName", e.getMessage());
             return "redirect:/accountInformation";
         }
     }
@@ -89,10 +86,10 @@ public class UserController {
         try {
             userService.updateEmail(email, principal.getName());
             redirectAttributes.addFlashAttribute("username", principal.getName());
-            redirectAttributes.addFlashAttribute("Successfully Updated Email");
+            redirectAttributes.addFlashAttribute("infoEmail", "Successfully Updated Email");
             return "redirect:/accountInformation";
-        } catch (UserNotFoundException | DataAccessException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+        } catch (UserNotFoundException | DataAccessException | EmailAlreadyExistsException e) {
+            redirectAttributes.addFlashAttribute("errorEmail", e.getMessage());
             return "redirect:/accountInformation";
         }
     }
@@ -102,10 +99,10 @@ public class UserController {
         try {
             userService.updatePass(currentPass, newPass, principal.getName());
             redirectAttributes.addFlashAttribute("username", principal.getName());
-            redirectAttributes.addFlashAttribute("Successfully Updated Password");
+            redirectAttributes.addFlashAttribute("infoPassword", "Successfully Updated Password");
             return "redirect:/accountInformation";
         } catch (PasswordUpdateException | UserNotFoundException | DataAccessException e) {
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addFlashAttribute("errorPassword", e.getMessage());
             return "redirect:/accountInformation";
         }
     }

@@ -17,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -102,18 +103,22 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void updateEmail(String email, String username) throws UserNotFoundException, DataAccessException {
+    public void updateEmail(String email, String username) throws UserNotFoundException, DataAccessException, EmailAlreadyExistsException {
         User user = userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User Not Found,Might be Session Issue; please login"));
         if (!email.equals(user.getEmail())) {
-            user.setEmail(email);
-            userRepository.save(user);
+            User emailCheck = userRepository.findByEmail(email).orElse(null);
+            if (ObjectUtils.isEmpty(emailCheck)) {
+                user.setEmail(email);
+                userRepository.save(user);
+            }else{
+                throw new EmailAlreadyExistsException("The given mail already registered with another account");
+            }
         }
     }
 
     public void updatePass(String currentPass, String newPass, String username) throws UserNotFoundException, DataAccessException, PasswordUpdateException {
         User user = userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User Not Found,Might be Session Issue; please login"));
-        String encodedCurrentPass = passwordEncoder.encode(currentPass);
-        if (!encodedCurrentPass.equals(user.getPassword())) {
+        if (!passwordEncoder.matches(currentPass,user.getPassword())) {
             throw new PasswordUpdateException("Current Password is wrong,please use forgot password to create a new password and update here");
         } else if (currentPass.equals(newPass)) {
             throw new PasswordUpdateException("Password should not be same as old password");
