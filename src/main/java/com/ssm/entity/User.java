@@ -43,7 +43,7 @@ public class User {
 
     private Collection<Role> roles;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "users_groups",
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
