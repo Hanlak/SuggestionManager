@@ -21,7 +21,7 @@
     <h2>Account Information</h2>
 
     <!-- FullName section -->
-    <h5>FullName</h5>
+    <h3>FullName</h3>
     <div id="parentFullName">
         <div id="nameSection">
             <p id="name" th:text="${accountInfo.name}"></p>
@@ -32,16 +32,18 @@
                    th:value="${accountInfo.name}"
                    pattern="^[a-zA-Z]+(?: [a-zA-Z]+)?$"
                    title="Enter a valid name">
-            <button id="submitEditFullName" class="btn btn-success btn-sm" onclick="submitEditFullName()">Submit</button>
-            <button id="cancelEditFullName" class="btn btn-secondary btn-sm" onclick="cancelEditFullName()">Cancel</button>
+            <button id="submitEditFullName" class="btn btn-success btn-sm" onclick="submitEditFullName()">Submit
+            </button>
+            <button id="cancelEditFullName" class="btn btn-secondary btn-sm" onclick="cancelEditFullName()">Cancel
+            </button>
             <!-- Info and error messages for FullName section -->
             <div th:if="${infoFullName}" class="alert alert-info" role="alert" th:text="${infoFullName}"></div>
             <div th:if="${errorFullName}" class="alert alert-danger" role="alert" th:text="${errorFullName}"></div>
         </div>
     </div>
-
+    <br/>
     <!-- Email section -->
-    <h5>Email</h5>
+    <h3>Email</h3>
     <div id="parentEmail">
         <div id="emailSection">
             <p id="email" th:text="${accountInfo.email}"></p>
@@ -58,9 +60,9 @@
             <div th:if="${errorEmail}" class="alert alert-danger" role="alert" th:text="${errorEmail}"></div>
         </div>
     </div>
-
+    <br/>
     <!-- Update Password section -->
-    <h5>Update Password</h5>
+    <h3>Update Password</h3>
     <div id="parentPassword">
         <div id="passwordSection">
             <label for="currentPassword">Current Password</label>
@@ -165,6 +167,7 @@
         form.submit();
         form.reset();
     }
+
 
 </script>
 </body>
