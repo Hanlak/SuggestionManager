@@ -12,7 +12,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -50,7 +49,7 @@ public class GroupService {
         groupRepository.save(userGroup);
     }
 
-    public Boolean sendRequestToJoinGroup(String groupName, String userName) throws DataAccessException, UserAlreadyExistsException, UserNotFoundException, GroupRequestException {
+    public Boolean sendRequestToJoinGroup(String groupName, String userName) throws DataAccessException, UserAlreadyExistsException, UserNotFoundException, GroupRequestException, PendingRequestException {
         Optional<User> user = userRepository.findByUserName(userName);
         Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
         if (user.isPresent() && group.isPresent()) { //check user and group present or not
@@ -69,9 +68,11 @@ public class GroupService {
                     if (groupRequest.get().getStatus().equals(GroupRequest.RequestStatus.REJECTED)) {
                         int savedState = groupRequestRepository.changeStatusToPending(GroupRequest.RequestStatus.PENDING, groupRequest.get().getId());
                         return savedState != 0;
+                    } else if (groupRequest.get().getStatus().equals(GroupRequest.RequestStatus.PENDING)) {
+                        throw new PendingRequestException("The Request Already Sent and Its in Pending state");
                     } else {
                         //TODO: HAVE TO DISCUSS ON THIS EXCEPTION
-                        throw new GroupRequestException("Error while Processing your Group Request: Please try again");
+                        throw new GroupRequestException("Try Checking With Admin or support about the request");
                     }
                 }
             }
@@ -92,7 +93,6 @@ public class GroupService {
     }
 
 
-    @Transactional
     public void deleteGroup(String groupName, String userName) throws DataAccessException, UserNotFoundException {
         Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
         if (group.isPresent()) {

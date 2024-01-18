@@ -1,8 +1,8 @@
 package com.ssm.controller;
 
 import com.ssm.entity.GroupRequest;
-import com.ssm.entity.UserGroup;
 import com.ssm.exception.GroupRequestException;
+import com.ssm.exception.PendingRequestException;
 import com.ssm.exception.UserAlreadyExistsException;
 import com.ssm.exception.UserNotFoundException;
 import com.ssm.service.GroupService;
@@ -74,7 +74,7 @@ public class GroupController {
         } catch (UserNotFoundException | GroupRequestException customException) {
             redirectAttributes.addFlashAttribute("error", customException.getMessage());
             return "redirect:/groups/requestToJoinGroup";
-        } catch (UserAlreadyExistsException userAlreadyExistsException) {
+        } catch (UserAlreadyExistsException | PendingRequestException userAlreadyExistsException) {
             redirectAttributes.addFlashAttribute("info", userAlreadyExistsException.getMessage());
             return "redirect:/index";
         }
