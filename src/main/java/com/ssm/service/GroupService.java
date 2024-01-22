@@ -172,10 +172,10 @@ public class GroupService {
     }
 
 
-    public List<UserGroup> getAllGroupsBasedOnUser(String adminUser) throws UserNotFoundException {
+    public List<UserGroupDTO> getAllGroupsBasedOnUser(String adminUser) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUserName(adminUser);
         if (!user.isPresent()) throw new UserNotFoundException("System Error: No Such User Exists");
-        return groupRepository.findByAdminOrUsers(user.get());
+        return groupRepository.findByAdminOrUsers(user.get()).stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
     }
 
     public List<GroupRequest> displayPendingRequests(String username) throws UserNotFoundException {

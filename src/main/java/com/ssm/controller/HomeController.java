@@ -1,7 +1,7 @@
 package com.ssm.controller;
 
 
-import com.ssm.entity.UserGroup;
+import com.ssm.dto.UserGroupDTO;
 import com.ssm.exception.UserNotFoundException;
 import com.ssm.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class HomeController {
         ModelAndView model = new ModelAndView("newindex");
         model.addObject("username", principal.getName());
         try {
-            List<UserGroup> groups = groupService.getAllGroupsBasedOnUser(principal.getName());
+            List<UserGroupDTO> groups = groupService.getAllGroupsBasedOnUser(principal.getName());
             model.addObject("groups", groups);
         } catch (UserNotFoundException e) {
             model.addObject("error", e.getMessage());
