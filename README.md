@@ -105,5 +105,4 @@ application will use this password to connect to the MySQL database.
 For mail configuration, set the following environment variables in your run configuration:
 
 - `mail_sender_user` - Your email address for sending emails.
-- `mail_sender_pass` - Your email password(Create App password from 2-factor authentication from gmail account) .
-
+- `mail_sender_pass` - Your email password(Create App password from 2-factor authentication from gmail account)
