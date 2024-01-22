@@ -22,6 +22,25 @@ public class UserGroup {
     @Column(name = "GroupName", nullable = false, length = 255)
     private String groupName;
 
+    @Column(name = "description", length = 500)
+    private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "group_type", nullable = false)
+    private GroupType groupType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "subscription", nullable = false)
+    private Subscription subscription;
+
+    public enum GroupType {
+        SWING, POSITIONAL, LONG_TERM
+    }
+
+    public enum Subscription {
+        PAID, UNPAID
+    }
+
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private User admin;

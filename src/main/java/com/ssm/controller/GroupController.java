@@ -1,5 +1,6 @@
 package com.ssm.controller;
 
+import com.ssm.dto.UserGroupDTO;
 import com.ssm.entity.GroupRequest;
 import com.ssm.exception.GroupRequestException;
 import com.ssm.exception.PendingRequestException;
@@ -9,10 +10,7 @@ import com.ssm.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -27,6 +25,11 @@ public class GroupController {
     private GroupService groupService;
 
 
+    @ModelAttribute("userGroup")
+    public UserGroupDTO userGroupDTO() {
+        return new UserGroupDTO();
+    }
+
     @GetMapping("/createGroup")
     public ModelAndView createGroup(Principal principal) {
         ModelAndView modelAndView = new ModelAndView("creategroup");
@@ -35,9 +38,10 @@ public class GroupController {
     }
 
     @PostMapping("/createGroup")
-    public String createGroup(@RequestParam("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
+    public String createGroup(@ModelAttribute("userGroup") UserGroupDTO userGroupDTO, Principal principal, RedirectAttributes redirectAttributes) {
         try {
-            groupService.createGroup(groupName, principal.getName());
+            groupService.createGroup(userGroupDTO, principal.getName());
+            System.out.println(userGroupDTO.getGroupType() + " " + userGroupDTO.getSubscription());
             redirectAttributes.addFlashAttribute("info", "UserGroup Created Successfully");
             return "redirect:/index";
         } catch (UserNotFoundException | UserAlreadyExistsException userNotFoundException) {

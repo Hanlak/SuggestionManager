@@ -1,9 +1,11 @@
 package com.ssm.service;
 
+import com.ssm.dto.UserGroupDTO;
 import com.ssm.entity.GroupRequest;
 import com.ssm.entity.User;
 import com.ssm.entity.UserGroup;
 import com.ssm.exception.*;
+import com.ssm.mapper.IUserGroupMapper;
 import com.ssm.repository.GroupRepository;
 import com.ssm.repository.GroupRequestRepository;
 import com.ssm.repository.UserRepository;
@@ -23,27 +25,28 @@ public class GroupService {
     @Autowired
     GroupRepository groupRepository;
 
-
+    @Autowired
+    IUserGroupMapper userGroupMapper;
     @Autowired
     GroupRequestRepository groupRequestRepository;
 
-    public GroupService(UserRepository userRepository, GroupRepository groupRepository) {
+    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
+        this.userGroupMapper = userGroupMapper;
     }
 
-    public void createGroup(String groupName, String adminUsername) throws UserNotFoundException, DataAccessException, UserAlreadyExistsException {
+    public void createGroup(UserGroupDTO userGroupDTO, String adminUsername) throws UserNotFoundException, DataAccessException, UserAlreadyExistsException {
         Optional<User> admin = userRepository.findByUserName(adminUsername);
         if (!admin.isPresent()) {
             throw new UserNotFoundException("User Not Found when Creating the userGroup");
         }
-        Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
+        Optional<UserGroup> group = groupRepository.findByGroupName(userGroupDTO.getGroupName());
 
         if (group.isPresent()) {
             throw new UserAlreadyExistsException("Group Already Exists.Please try with another Name");
         }
-        UserGroup userGroup = new UserGroup();
-        userGroup.setGroupName(groupName);
+        UserGroup userGroup = userGroupMapper.fromUserGroupDTO(userGroupDTO);
         userGroup.setAdmin(admin.get());
         userGroup.getUsers().add(admin.get()); // Admin is automatically added to the userGroup
         groupRepository.save(userGroup);
