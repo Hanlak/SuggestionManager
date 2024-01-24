@@ -198,6 +198,10 @@ public class GroupService {
         return groupRepository.findAll().stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
     }
 
+    public UserGroup getGroupByGroupName(String groupName) throws GroupNotFoundException {
+        return groupRepository.findByGroupName(groupName).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists; Please Try again"));
+    }
+
 
     public List<GroupRequest> displayPendingRequests(String username) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUserName(username);

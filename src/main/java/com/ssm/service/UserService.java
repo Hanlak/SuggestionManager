@@ -110,7 +110,7 @@ public class UserService implements UserDetailsService {
             if (ObjectUtils.isEmpty(emailCheck)) {
                 user.setEmail(email);
                 userRepository.save(user);
-            }else{
+            } else {
                 throw new EmailAlreadyExistsException("The given mail already registered with another account");
             }
         }
@@ -118,7 +118,7 @@ public class UserService implements UserDetailsService {
 
     public void updatePass(String currentPass, String newPass, String username) throws UserNotFoundException, DataAccessException, PasswordUpdateException {
         User user = userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User Not Found,Might be Session Issue; please login"));
-        if (!passwordEncoder.matches(currentPass,user.getPassword())) {
+        if (!passwordEncoder.matches(currentPass, user.getPassword())) {
             throw new PasswordUpdateException("Current Password is wrong,please use forgot password to create a new password and update here");
         } else if (currentPass.equals(newPass)) {
             throw new PasswordUpdateException("Password should not be same as old password");
@@ -141,5 +141,8 @@ public class UserService implements UserDetailsService {
             throw new UserAlreadyExistsException("email is already registered.Please try another email");
     }
 
+    public User getUserByUsername(String username) throws UserNotFoundException {
+        return userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("No Such User Exists.Session Might Expired.Login Again"));
+    }
 
 }
