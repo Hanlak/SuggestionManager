@@ -52,6 +52,22 @@ public class GroupService {
         groupRepository.save(userGroup);
     }
 
+    public Boolean isPaymentEligible(String groupName, String username) throws GroupNotFoundException, UserAlreadyExistsException {
+        Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
+
+        if (group.isPresent()) {
+            if (username.equals(group.get().getAdmin().getUserName()) || group.get().getUsers().stream().anyMatch(x -> username.equals(x.getUserName()))) {
+                throw new UserAlreadyExistsException("You Already Part of the Group you are trying to Join.");
+            } else {
+                if ("PAID".equals(group.get().getSubscription().name())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else throw new GroupNotFoundException("There is no Such Group Exists");
+    }
+
     public Boolean sendRequestToJoinGroup(String groupName, String userName) throws DataAccessException, UserAlreadyExistsException, UserNotFoundException, GroupRequestException, PendingRequestException {
         Optional<User> user = userRepository.findByUserName(userName);
         Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
@@ -177,6 +193,11 @@ public class GroupService {
         if (!user.isPresent()) throw new UserNotFoundException("System Error: No Such User Exists");
         return groupRepository.findByAdminOrUsers(user.get()).stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
     }
+
+    public List<UserGroupDTO> getAllGroups() throws DataAccessException {
+        return groupRepository.findAll().stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
+    }
+
 
     public List<GroupRequest> displayPendingRequests(String username) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUserName(username);

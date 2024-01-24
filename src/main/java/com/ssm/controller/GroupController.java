@@ -2,14 +2,12 @@ package com.ssm.controller;
 
 import com.ssm.dto.UserGroupDTO;
 import com.ssm.entity.GroupRequest;
-import com.ssm.exception.GroupRequestException;
-import com.ssm.exception.PendingRequestException;
-import com.ssm.exception.UserAlreadyExistsException;
-import com.ssm.exception.UserNotFoundException;
+import com.ssm.exception.*;
 import com.ssm.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -54,15 +52,37 @@ public class GroupController {
     }
 
     @GetMapping("/requestToJoinGroup")
-    public ModelAndView requestToJoinGroup(Principal principal) {
-        ModelAndView modelAndView = new ModelAndView("joingroup");
-        modelAndView.addObject("username", principal.getName());
-        return modelAndView;
+    public String requestToJoinGroup(Principal principal, Model model) {
+        model.addAttribute("username", principal.getName());
+        List<UserGroupDTO> groups = groupService.getAllGroups();
+        model.addAttribute("groups", groups);
+        return "joingroup";
+    }
+
+    @GetMapping("/joinGroup/{groupId}/{groupName}")
+    public String joinGroup(Principal principal, @PathVariable("groupId") Long id, @PathVariable("groupName") String groupName, RedirectAttributes redirectAttributes, Model model) {
+        try {
+            if (groupService.isPaymentEligible(groupName, principal.getName())) {
+                //Check if there is a payment entry for the user and if it's there if it's a success payment or not;
+                model.addAttribute("groupName", groupName);
+                return "paypage";
+            } else {
+                return "redirect:/groups/sendRequest/" + groupName;
+            }
+        } catch (GroupNotFoundException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+            return "redirect:/groups/requestToJoinGroup";
+        } catch (UserAlreadyExistsException exception) {
+            redirectAttributes.addFlashAttribute("info", exception.getMessage());
+            return "redirect:/suggestion/groupIndex/" + id + "/" + groupName;
+        }
+
     }
 
 
-    @PostMapping("/sendRequest")
-    public String sendRequestToJoinGroup(@RequestParam("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
+
+    @GetMapping("/sendRequest/{groupName}")
+    public String sendRequestToJoinGroup(@PathVariable("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
         try {
             Boolean isRequestSent = groupService.sendRequestToJoinGroup(groupName, principal.getName());
             if (isRequestSent) {
