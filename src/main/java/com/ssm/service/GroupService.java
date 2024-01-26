@@ -10,6 +10,7 @@ import com.ssm.repository.GroupRepository;
 import com.ssm.repository.GroupRequestRepository;
 import com.ssm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -30,10 +31,18 @@ public class GroupService {
     @Autowired
     GroupRequestRepository groupRequestRepository;
 
-    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper) {
+    @Autowired
+    SSMMailService ssmMailService;
+
+    @Value("${mail_sender_user}")
+    private String mailSenderUser;
+
+
+    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper, SSMMailService ssmMailService) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
         this.userGroupMapper = userGroupMapper;
+        this.ssmMailService = ssmMailService;
     }
 
     public void createGroup(UserGroupDTO userGroupDTO, String adminUsername) throws UserNotFoundException, DataAccessException, UserAlreadyExistsException {
@@ -178,6 +187,8 @@ public class GroupService {
                     userRepository.save(removeMember);
                     groupRepository.save(userGroup.get());
                     groupRequestRepository.deleteByUser(removeMember);
+                    //send notification mail to user that he was being removed by the admin;
+                    ssmMailService.toSendEMail(removeMember.getEmail(), mailSenderUser, "Suggestion Manager", "you have been removed from the" + userGroup.get().getGroupName() + " Group");
                 } else {
                     throw new UserNotFoundException("Unable to find the member in" + userGroup.get().getGroupName());
                 }
