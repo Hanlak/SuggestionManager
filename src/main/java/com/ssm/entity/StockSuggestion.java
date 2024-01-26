@@ -7,7 +7,9 @@ import lombok.Setter;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "stock_suggestions")
@@ -38,5 +40,8 @@ public class StockSuggestion {
     @Temporal(TemporalType.DATE)
     @Column(name = "lastUpdated", nullable = false)
     private Date lastUpdated;
+
+    @OneToMany(mappedBy = "stockSuggestion", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
 }

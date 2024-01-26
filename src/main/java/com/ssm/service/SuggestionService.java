@@ -128,6 +128,14 @@ public class SuggestionService {
         return sellSuggestionRepository.findById(id).orElseThrow(() -> new SuggestionNotFoundException("Sell Suggestion Not Found to Edit"));
     }
 
+    public StockSuggestion getStockSuggestion(Long id) throws SuggestionNotFoundException {
+        return suggestionRepository.findById(id).orElseThrow(() -> new SuggestionNotFoundException("Suggestion Not Found"));
+    }
+
+    public void addCommentToSuggestion(StockSuggestion suggestion) throws DataAccessException {
+        suggestionRepository.save(suggestion);
+    }
+
     private User getUserForLikes(String username) throws UserNotFoundException {
         return userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User Not Found While Fetching the Likes"));
     }
