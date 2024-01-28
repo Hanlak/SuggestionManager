@@ -55,7 +55,7 @@ public class SuggestionController {
             model.addAttribute("userGroup", userGroup);
             boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
             // if he is admin of the group no need to check the paid stuff
-            if (!isAdmin) {
+            if (UserGroup.Subscription.PAID.equals(userGroup.getSubscription()) && !isAdmin) {
                 String subscriptionStatusOrMessage = paymentService.validatePaymentSubscription(userGroup, principal.getName());
                 if (!"ACTIVE".equals(subscriptionStatusOrMessage))
                     model.addAttribute("info", subscriptionStatusOrMessage);
