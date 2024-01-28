@@ -194,7 +194,7 @@ public class GroupService {
                 }
             }
         } else {
-            throw new GroupNotFoundException("Group did not Exist to delete");
+            throw new GroupNotFoundException("Group did not Exist to remove the members: weird right. contact support");
         }
     }
 

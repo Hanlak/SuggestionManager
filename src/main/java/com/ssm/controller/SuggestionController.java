@@ -9,6 +9,7 @@ import com.ssm.entity.SellSuggestion;
 import com.ssm.entity.UserGroup;
 import com.ssm.exception.*;
 import com.ssm.service.GroupService;
+import com.ssm.service.PaymentService;
 import com.ssm.service.SuggestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -33,12 +34,15 @@ public class SuggestionController {
     SuggestionService suggestionService;
 
     @Autowired
+    PaymentService paymentService;
+    @Autowired
     GroupService groupService;
 
     List<String> priorities = Arrays.asList("HIGH", "LOW");
 
-    public SuggestionController(SuggestionService suggestionService) {
+    public SuggestionController(SuggestionService suggestionService, PaymentService paymentService) {
         this.suggestionService = suggestionService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping("/groupIndex/{id}/{groupName}")
@@ -50,14 +54,21 @@ public class SuggestionController {
             UserGroup userGroup = groupService.getUserGroupBasedOnGroupId(groupId);
             model.addAttribute("userGroup", userGroup);
             boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
+            // if he is admin of the group no need to check the paid stuff
+            if (!isAdmin) {
+                String subscriptionStatusOrMessage = paymentService.validatePaymentSubscription(userGroup, principal.getName());
+                if (!"ACTIVE".equals(subscriptionStatusOrMessage))
+                    model.addAttribute("info", subscriptionStatusOrMessage);
+            }
             model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
             model.addAttribute("isAdmin", isAdmin);
-            List<BuyLikeSuggestionDTO> buySuggestionList = suggestionService.getBuyLikeSuggestions(userGroup,principal.getName());
-            List<SellLikeSuggestionDTO> sellSuggestionList = suggestionService.getSellLikeSuggestions(userGroup,principal.getName());
+            List<BuyLikeSuggestionDTO> buySuggestionList = suggestionService.getBuyLikeSuggestions(userGroup, principal.getName());
+            List<SellLikeSuggestionDTO> sellSuggestionList = suggestionService.getSellLikeSuggestions(userGroup, principal.getName());
             model.addAttribute("buySuggestions", buySuggestionList);
             model.addAttribute("sellSuggestions", sellSuggestionList);
             return "groupindex";
-        } catch (GroupNotFoundException | UserNotFoundException | LikesException e) {
+        } catch (GroupNotFoundException | UserNotFoundException | LikesException | SubscriptionExpiredException |
+                 PaymentNotFoundException e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/index";
         } catch (DataAccessException dataAccessException) {
