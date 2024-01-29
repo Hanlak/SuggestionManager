@@ -21,6 +21,16 @@
     <div id="suggestionTable">
         <!-- Table for Buy Suggestions -->
         <h1>Buy Suggestions</h1>
+        <!-- Search bar for Buy Suggestions -->
+        <div class="input-group mb-3">
+            <label for="buySearchInput">Filter:</label>
+            <input type="text" class="form-control" placeholder="Search Buy Suggestions" id="buySearchInput">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="searchTable('buy')">Search</button>
+            </div>
+        </div>
+
+        <!-- Table For Buy Suggestions -->
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -53,7 +63,6 @@
                        th:onclick="toggleBuyLike([[${buySuggestion.id}]],[[${buySuggestion.likeState}]])"
                        th:text="${buySuggestion.likeState? 'Unlike' : 'Like'}"></a>
 
-
                     <!-- Add Edit and Delete buttons here -->
                     <a class="btn btn-primary btn-sm" th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
                        th:if="${isAdmin}">Edit</a>
@@ -77,6 +86,14 @@
             </tbody>
         </table>
         <h1>Sell Suggestions</h1>
+        <!-- Search bar Suggestions -->
+        <div class="input-group mb-3">
+            <label for="sellSearchInput">Filter:</label>
+            <input type="text" class="form-control" placeholder="Search Sell Suggestions" id="sellSearchInput">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" onclick="searchTable('sell')">Search</button>
+            </div>
+        </div>
         <table class="table table-bordered">
             <thead>
             <tr>
