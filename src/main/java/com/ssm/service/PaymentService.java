@@ -3,10 +3,7 @@ package com.ssm.service;
 import com.ssm.entity.Payment;
 import com.ssm.entity.User;
 import com.ssm.entity.UserGroup;
-import com.ssm.exception.GroupNotFoundException;
-import com.ssm.exception.PaymentNotFoundException;
-import com.ssm.exception.SubscriptionExpiredException;
-import com.ssm.exception.UserNotFoundException;
+import com.ssm.exception.*;
 import com.ssm.repository.PaymentRepository;
 import com.ssm.util.SSMUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +11,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -36,6 +35,33 @@ public class PaymentService {
         User user = userService.getUserByUsername(username);
         UserGroup userGroup = groupService.getGroupByGroupName(groupName);
         paymentRepository.save(mapPayment(user, userGroup));
+    }
+
+    public void makePayment(String groupName, String username) throws UserNotFoundException, GroupNotFoundException, PaymentNotFoundException, PaymentException {
+        User user = userService.getUserByUsername(username);
+        UserGroup userGroup = groupService.getGroupByGroupName(groupName);
+        if (UserGroup.Subscription.PAID.equals(userGroup.getSubscription())) {
+            Payment payment = paymentRepository.findByUserAndUserGroup(user, userGroup).orElseThrow(() -> new PaymentNotFoundException("Error While Activating Subscription.Payment Not Found:Contact Support"));
+            if (SSMUtil.isWithin7DaysOfOneYearAfterPaymentDate(payment.getPaymentDate()) || Payment.SubscriptionStatus.EXPIRED.equals(payment.getSubscriptionStatus())) {
+                payment.setPaymentStatus(Payment.PaymentStatus.SUCCESS);
+                payment.setSubscriptionStatus(Payment.SubscriptionStatus.ACTIVE);
+                if (SSMUtil.isWithin7DaysOfOneYearAfterPaymentDate(payment.getPaymentDate())) {
+                    payment.setPaymentDate(payment.getPaymentDate().plus(1, ChronoUnit.YEARS));
+                } else {
+                    payment.setPaymentDate(LocalDate.now());
+                }
+                paymentRepository.save(payment);
+            } else {
+                throw new PaymentException("The Subscription is still Active And if you unable to Access the group.Please Contact Support");
+            }
+        } else {
+            throw new PaymentException("This is Not a Paid Group; You Can join by Sending Request");
+        }
+    }
+
+    public List<String> getAllPaidNonAdminGroupsBasedOnUser(String username) throws UserNotFoundException {
+        User user = userService.getUserByUsername(username);
+        return groupService.getAllPaidNonAdminGroupsBasedOnUser(user);
     }
 
     private Payment mapPayment(User user, UserGroup userGroup) {

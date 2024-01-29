@@ -209,6 +209,23 @@ public class GroupService {
         return groupRepository.findAll().stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
     }
 
+    public List<String> getAllPaidNonAdminGroupsBasedOnUser(User user) throws DataAccessException {
+        return groupRepository.findByAdminOrUsers(user).stream()
+                .filter(this::isPaidGroup)
+                .filter(userGroup -> this.shouldNotBeAnAdmin(userGroup, user))
+                .map(userGroupMapper::fromUserGroup)
+                .map(UserGroupDTO::getGroupName)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isPaidGroup(UserGroup userGroup) {
+        return UserGroup.Subscription.PAID.equals(userGroup.getSubscription());
+    }
+
+    private boolean shouldNotBeAnAdmin(UserGroup userGroup, User user) {
+        return !userGroup.getAdmin().getUserName().equals(user.getUserName());
+    }
+
     public UserGroup getGroupByGroupName(String groupName) throws GroupNotFoundException {
         return groupRepository.findByGroupName(groupName).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists; Please Try again"));
     }
