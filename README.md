@@ -29,6 +29,15 @@ share suggestions, catering especially to naive retail traders.
 - Users with Member roles can vote(like) or down vote(unlike) a suggestion.
 - Confidence levels are generated based on votes, used to sort and highlight the data.
 - Top-rated suggestions are displayed by default.
+### Payment
+
+- Groups are divided into paid and unpaid
+- a separate will be allowed in case if the subscription expired or soon to be expired
+- upon payment user will be given access to the group and be able to send request to the group;
+
+### Notification
+
+- Notification will be sent for removal, accept and reject to the groups action;
 
 ## Project Board
 
