@@ -266,13 +266,18 @@ public class GroupService {
                 UserGroup savedUserGroup = groupRepository.save(userGroup);
                 return (!ObjectUtils.isEmpty(savedUserGroup)) && (!ObjectUtils.isEmpty(savedUser));
             } else {
-                System.out.println("There is another error while finding user or UserGroup from GroupRequest");
                 return false;
             }
         }
         return false;
     }
 
+    public void notifyUserAboutRequest(Long groupRequestId, String status) throws NotifyException {
+        GroupRequest groupRequest = groupRequestRepository.findById(groupRequestId).orElseThrow(() -> new NotifyException("Problem with Sending Notification"));
+        User user = groupRequest.getUser();
+        String message = "You have been " + ("ACCEPTED".equals(status) ? "accepted" : "rejected") + "to the group: " + groupRequest.getUserGroup().getGroupName();
+        ssmMailService.toSendEMail(user.getEmail(), mailSenderUser, "SUGGESTION MANAGER :: JOIN REQUEST", message);
+    }
 
     public UserGroup getUserGroupBasedOnGroupId(Long groupId) throws GroupNotFoundException {
         return groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists"));
