@@ -9,6 +9,7 @@ import com.ssm.util.SSMUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -34,7 +35,14 @@ public class PaymentService {
     public void updatePayment(String groupName, String username) throws UserNotFoundException, GroupNotFoundException, DataAccessException {
         User user = userService.getUserByUsername(username);
         UserGroup userGroup = groupService.getGroupByGroupName(groupName);
-        paymentRepository.save(mapPayment(user, userGroup));
+        Payment payment = paymentRepository.findByUserAndUserGroup(user, userGroup).orElse(null);
+        if (ObjectUtils.isEmpty(payment))
+            paymentRepository.save(mapPayment(user, userGroup));
+        else {
+            payment.setSubscriptionStatus(Payment.SubscriptionStatus.ACTIVE);
+            payment.setPaymentDate(LocalDate.now());
+            paymentRepository.save(payment);
+        }
     }
 
     public void makePayment(String groupName, String username) throws UserNotFoundException, GroupNotFoundException, PaymentNotFoundException, PaymentException {
@@ -104,6 +112,14 @@ public class PaymentService {
             return "You Subscription gonna expire in " + remainingDays + " days. Please pay before its expired";
         }
         return Payment.SubscriptionStatus.ACTIVE.toString();
+    }
+
+    public void changePaymentStatusToRedacted(UserGroup userGroup) throws DataAccessException {
+        paymentRepository.updateSubscriptionStatusByUserGroup(userGroup, Payment.SubscriptionStatus.REDACTED);
+    }
+
+    public void changePaymentStatus(User user, UserGroup userGroup,Payment.SubscriptionStatus subscriptionStatus) throws DataAccessException {
+        paymentRepository.updateSubscriptionStatusByUserGroupAndUser(userGroup, user, subscriptionStatus);
     }
 
 }

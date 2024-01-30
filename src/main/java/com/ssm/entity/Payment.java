@@ -42,6 +42,6 @@ public class Payment {
     }
 
     public enum SubscriptionStatus {
-        ACTIVE, EXPIRED
+        ACTIVE, EXPIRED, REDACTED, REFUNDED, LEFT
     }
 }

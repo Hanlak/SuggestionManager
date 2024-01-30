@@ -2,6 +2,7 @@ package com.ssm.service;
 
 import com.ssm.dto.UserGroupDTO;
 import com.ssm.entity.GroupRequest;
+import com.ssm.entity.Payment;
 import com.ssm.entity.User;
 import com.ssm.entity.UserGroup;
 import com.ssm.exception.*;
@@ -34,15 +35,19 @@ public class GroupService {
     @Autowired
     SSMMailService ssmMailService;
 
+    @Autowired
+    PaymentService paymentService;
+
     @Value("${mail_sender_user}")
     private String mailSenderUser;
 
 
-    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper, SSMMailService ssmMailService) {
+    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper, SSMMailService ssmMailService, PaymentService paymentService) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
         this.userGroupMapper = userGroupMapper;
         this.ssmMailService = ssmMailService;
+        this.paymentService = paymentService;
     }
 
     public void createGroup(UserGroupDTO userGroupDTO, String adminUsername) throws UserNotFoundException, DataAccessException, UserAlreadyExistsException {
@@ -127,6 +132,7 @@ public class GroupService {
             if (userName.equals(group.get().getAdmin().getUserName())) {
                 groupRepository.deleteById(group.get().getId());
                 groupRequestRepository.deleteByUserGroup(group.get());
+                paymentService.changePaymentStatusToRedacted(group.get());
             } else {
                 throw new UserNotFoundException("Only Admin of the Group Can delete the group");
             }
@@ -155,6 +161,7 @@ public class GroupService {
                     userRepository.save(member);
                     groupRepository.save(userGroup.get());
                     groupRequestRepository.deleteByUser(member);
+                    paymentService.changePaymentStatus(member, userGroup.get(), Payment.SubscriptionStatus.LEFT);
                 } else {
                     throw new LeaveGroupException("Unable to find the member in" + userGroup.get().getGroupName());
                 }
@@ -187,6 +194,7 @@ public class GroupService {
                     userRepository.save(removeMember);
                     groupRepository.save(userGroup.get());
                     groupRequestRepository.deleteByUser(removeMember);
+                    paymentService.changePaymentStatus(removeMember, userGroup.get(), Payment.SubscriptionStatus.REFUNDED);
                     //send notification mail to user that he was being removed by the admin;
                     ssmMailService.toSendEMail(removeMember.getEmail(), mailSenderUser, "Suggestion Manager", "you have been removed from the" + userGroup.get().getGroupName() + " Group");
                 } else {
