@@ -17,7 +17,13 @@
 
     <h1 class="mb-4">Pending Requests</h1>
 
-    <table class="table table-bordered table-hover">
+    <!-- Check if pendingRequests is empty -->
+    <div th:if="${#lists.isEmpty(pendingRequests)}">
+        <p>There are No Pending Requests to Display</p>
+    </div>
+
+    <!-- Display the table only if pendingRequests is not empty -->
+    <table class="table table-bordered table-hover" th:unless="${#lists.isEmpty(pendingRequests)}">
         <thead class="thead-light">
         <tr>
             <th>User</th>
@@ -32,7 +38,7 @@
             <td th:text="${request.userGroup.groupName}"></td>
             <td>
                 <a class="btn btn-success btn-sm" th:href="@{'/request/'+ ${request.id} +'/ACCEPTED'}" role="button">Accept</a>
-                <a class="btn btn-danger btn-sm" th:href="@{'/request/'+ ${request.id} +'/REJECTED'}"  role="button">Reject</a>
+                <a class="btn btn-danger btn-sm" th:href="@{'/request/'+ ${request.id} +'/REJECTED'}" role="button">Reject</a>
             </td>
         </tr>
         </tbody>
