@@ -9,6 +9,7 @@ import com.ssm.exception.*;
 import com.ssm.mapper.IUserGroupMapper;
 import com.ssm.repository.GroupRepository;
 import com.ssm.repository.GroupRequestRepository;
+import com.ssm.repository.PaymentRepository;
 import com.ssm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,21 +34,21 @@ public class GroupService {
     GroupRequestRepository groupRequestRepository;
 
     @Autowired
+    PaymentRepository paymentRepository;
+    @Autowired
     SSMMailService ssmMailService;
 
-    @Autowired
-    PaymentService paymentService;
 
     @Value("${mail_sender_user}")
     private String mailSenderUser;
 
 
-    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper, SSMMailService ssmMailService, PaymentService paymentService) {
+    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper, SSMMailService ssmMailService, PaymentRepository paymentRepository) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
         this.userGroupMapper = userGroupMapper;
         this.ssmMailService = ssmMailService;
-        this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
     }
 
     public void createGroup(UserGroupDTO userGroupDTO, String adminUsername) throws UserNotFoundException, DataAccessException, UserAlreadyExistsException {
@@ -132,7 +133,7 @@ public class GroupService {
             if (userName.equals(group.get().getAdmin().getUserName())) {
                 groupRepository.deleteById(group.get().getId());
                 groupRequestRepository.deleteByUserGroup(group.get());
-                paymentService.changePaymentStatusToRedacted(group.get());
+                paymentRepository.updateSubscriptionStatusByUserGroup(group.get(), Payment.SubscriptionStatus.REDACTED);
             } else {
                 throw new UserNotFoundException("Only Admin of the Group Can delete the group");
             }
@@ -161,7 +162,7 @@ public class GroupService {
                     userRepository.save(member);
                     groupRepository.save(userGroup.get());
                     groupRequestRepository.deleteByUser(member);
-                    paymentService.changePaymentStatus(member, userGroup.get(), Payment.SubscriptionStatus.LEFT);
+                    paymentRepository.updateSubscriptionStatusByUserGroupAndUser(userGroup.get(), member, Payment.SubscriptionStatus.LEFT);
                 } else {
                     throw new LeaveGroupException("Unable to find the member in" + userGroup.get().getGroupName());
                 }
@@ -194,7 +195,7 @@ public class GroupService {
                     userRepository.save(removeMember);
                     groupRepository.save(userGroup.get());
                     groupRequestRepository.deleteByUser(removeMember);
-                    paymentService.changePaymentStatus(removeMember, userGroup.get(), Payment.SubscriptionStatus.REFUNDED);
+                    paymentRepository.updateSubscriptionStatusByUserGroupAndUser(userGroup.get(), removeMember, Payment.SubscriptionStatus.REFUNDED);
                     //send notification mail to user that he was being removed by the admin;
                     ssmMailService.toSendEMailAsync(removeMember.getEmail(), mailSenderUser, "Suggestion Manager", "you have been removed from the" + userGroup.get().getGroupName() + " Group");
                 } else {

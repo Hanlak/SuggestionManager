@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class SuggestionService {
 
     @Autowired
-    private SuggestionRepository suggestionRepository;
+    private final SuggestionRepository suggestionRepository;
 
     @Autowired
     BuySuggestionRepository buySuggestionRepository;

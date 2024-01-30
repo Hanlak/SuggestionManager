@@ -20,8 +20,11 @@ import java.util.List;
 public class GroupController {
 
     @Autowired
-    private GroupService groupService;
+    GroupService groupService;
 
+    public GroupController(GroupService groupService) {
+        this.groupService = groupService;
+    }
 
     @ModelAttribute("userGroup")
     public UserGroupDTO userGroupDTO() {

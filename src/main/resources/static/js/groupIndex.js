@@ -186,3 +186,13 @@ function searchTable(type) {
             }
         }
     }
+
+ function toggleTable(tableType) {
+        if (tableType === 'buy') {
+            document.getElementById('buyTable').style.display = 'block';
+            document.getElementById('sellTable').style.display = 'none';
+        } else if (tableType === 'sell') {
+            document.getElementById('buyTable').style.display = 'none';
+            document.getElementById('sellTable').style.display = 'block';
+        }
+    }

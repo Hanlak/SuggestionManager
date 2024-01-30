@@ -18,6 +18,13 @@
     <div class="alert alert-info" role="alert" th:if="${info}" th:text="${info}"></div>
     <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
 
+
+    <div class="btn-group" role="group" aria-label="Basic example">
+        <button type="button" class="btn btn-primary" onclick="toggleTable('buy')">Buy Suggestions</button>
+        <button type="button" class="btn btn-primary" onclick="toggleTable('sell')">Sell Suggestions</button>
+    </div>
+
+
     <div id="suggestionTable">
         <!-- Table for Buy Suggestions -->
         <h1>Buy Suggestions</h1>
@@ -31,7 +38,7 @@
         </div>
 
         <!-- Table For Buy Suggestions -->
-        <table class="table table-bordered">
+        <table id="buyTable" class="table table-bordered">
             <thead>
             <tr>
                 <!--                <th>ID</th>-->
@@ -94,7 +101,7 @@
                 <button class="btn btn-outline-secondary" type="button" onclick="searchTable('sell')">Search</button>
             </div>
         </div>
-        <table class="table table-bordered">
+        <table id="sellTable" style="display: none;"  class="table table-bordered">
             <thead>
             <tr>
                 <!--                <th>ID</th>-->

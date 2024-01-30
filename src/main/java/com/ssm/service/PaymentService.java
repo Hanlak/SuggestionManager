@@ -114,12 +114,4 @@ public class PaymentService {
         return Payment.SubscriptionStatus.ACTIVE.toString();
     }
 
-    public void changePaymentStatusToRedacted(UserGroup userGroup) throws DataAccessException {
-        paymentRepository.updateSubscriptionStatusByUserGroup(userGroup, Payment.SubscriptionStatus.REDACTED);
-    }
-
-    public void changePaymentStatus(User user, UserGroup userGroup,Payment.SubscriptionStatus subscriptionStatus) throws DataAccessException {
-        paymentRepository.updateSubscriptionStatusByUserGroupAndUser(userGroup, user, subscriptionStatus);
-    }
-
 }
