@@ -196,7 +196,7 @@ public class GroupService {
                     groupRequestRepository.deleteByUser(removeMember);
                     paymentService.changePaymentStatus(removeMember, userGroup.get(), Payment.SubscriptionStatus.REFUNDED);
                     //send notification mail to user that he was being removed by the admin;
-                    ssmMailService.toSendEMail(removeMember.getEmail(), mailSenderUser, "Suggestion Manager", "you have been removed from the" + userGroup.get().getGroupName() + " Group");
+                    ssmMailService.toSendEMailAsync(removeMember.getEmail(), mailSenderUser, "Suggestion Manager", "you have been removed from the" + userGroup.get().getGroupName() + " Group");
                 } else {
                     throw new UserNotFoundException("Unable to find the member in" + userGroup.get().getGroupName());
                 }
@@ -284,7 +284,7 @@ public class GroupService {
         GroupRequest groupRequest = groupRequestRepository.findById(groupRequestId).orElseThrow(() -> new NotifyException("Problem with Sending Notification"));
         User user = groupRequest.getUser();
         String message = "You have been " + ("ACCEPTED".equals(status) ? "accepted" : "rejected") + "to the group: " + groupRequest.getUserGroup().getGroupName();
-        ssmMailService.toSendEMail(user.getEmail(), mailSenderUser, "SUGGESTION MANAGER :: JOIN REQUEST", message);
+        ssmMailService.toSendEMailAsync(user.getEmail(), mailSenderUser, "SUGGESTION MANAGER :: JOIN REQUEST", message);
     }
 
     public UserGroup getUserGroupBasedOnGroupId(Long groupId) throws GroupNotFoundException {
