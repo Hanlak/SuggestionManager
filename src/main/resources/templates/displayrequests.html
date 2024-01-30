@@ -17,12 +17,12 @@
 
     <h1 class="mb-4">Pending Requests</h1>
 
-    <!-- Check if pendingRequests is empty -->
     <div th:if="${#lists.isEmpty(pendingRequests)}">
-        <p>There are No Pending Requests to Display</p>
+        <div class="alert alert-warning" role="alert">
+            <p>There are No Pending Requests to Display</p>
+        </div>
     </div>
 
-    <!-- Display the table only if pendingRequests is not empty -->
     <table class="table table-bordered table-hover" th:unless="${#lists.isEmpty(pendingRequests)}">
         <thead class="thead-light">
         <tr>
