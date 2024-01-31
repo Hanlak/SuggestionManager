@@ -57,12 +57,12 @@ function post_to_url(path, params, method) {
 }
 
 // Comments::
+let currentSuggestionId;
 function openCommentModal(suggestionId) {
+currentSuggestionId = suggestionId;
     // Fetch comments for the specific suggestionId
-    fetchComments(suggestionId)
+    fetchComments(currentSuggestionId)
         .then(comments => {
-            console.log('After comments:', comments);
-
             // Display comments in the modal
             var commentDisplay = document.getElementById('commentDisplay');
 
@@ -87,7 +87,6 @@ function openCommentModal(suggestionId) {
 
 function fetchComments(id) {
     const suggestionId = id;
-    console.log(id);
     // Make a GET request to the endpoint and return the promise
     return fetch(`/suggestion/comment/${suggestionId}`)
         .then(response => {
@@ -98,7 +97,6 @@ function fetchComments(id) {
         })
         .then(comments => {
             // Handle the received comments here
-            console.log('Received comments:', comments);
             return comments;
         })
         .catch(error => {
@@ -135,9 +133,10 @@ function addComment() {
 }
 
 function postComment(text) {
-    const suggestionId = document.getElementById('buySuggestionId').getAttribute('data-suggestionId');
+   const suggestionId = currentSuggestionId;
+
+    console.log("suggestion Id while posting comment: ", suggestionId)
     const commentText = text;
-    console.log("text", commentText);
 
     // Make a POST request to the endpoint and return the promise
     return fetch('/suggestion/comment', {
@@ -155,7 +154,6 @@ function postComment(text) {
     })
     .then(comment => {
         // Handle the received comment here
-        console.log('Received comment after adding a new comment:', comment);
         return comment;
     })
     .catch(error => {

@@ -74,7 +74,7 @@
                        th:if="${isAdmin}">Delete</a>
                 </td>
                 <td>
-                    <div id="buySuggestionId" th:data-suggestionId="${buySuggestion.id}"></div>
+                    <!--                    <div id="buySuggestionId" th:data-suggestionId="${buySuggestion.id}"></div>-->
                     <button class="btn btn-primary btn-sm" data-target="#commentModal" data-toggle="modal"
                             th:onclick="openCommentModal([[${buySuggestion.id}]])"
                             type="button">
@@ -134,7 +134,7 @@
                        th:if="${isAdmin}">Delete</a>
                 </td>
                 <td>
-                    <div id="sellSuggestionId" th:data-suggestionId="${sellSuggestion.id}"></div>
+                    <!--                    <div id="sellSuggestionId" th:data-suggestionId="${sellSuggestion.id}"></div>-->
                     <button class="btn btn-primary btn-sm" data-target="#commentModal" data-toggle="modal"
                             th:onclick="openCommentModal([[${sellSuggestion.id}]])"
                             type="button">
