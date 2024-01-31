@@ -5,6 +5,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 public class SSMMailService {
     @Autowired
@@ -19,6 +21,10 @@ public class SSMMailService {
         endgameMsg.setText(msgBody);
         ssmMailSender.send(endgameMsg);
         return "OK";
+    }
+
+    public CompletableFuture<Void> toSendEMailAsync(String recipientEmail, String sender, String subject, String message) {
+        return CompletableFuture.runAsync(() -> toSendEMail(recipientEmail, sender, subject, message));
     }
 
 }

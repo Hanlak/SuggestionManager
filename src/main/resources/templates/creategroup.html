@@ -27,6 +27,26 @@
                    maxlength="14"
                    required>
         </div>
+        <div class="form-group">
+            <label for="groupType">Category</label>
+            <select class="form-control" id="groupType" name="groupType" required>
+                <option value="LONG_TERM">LONG TERM</option>
+                <option value="POSITIONAL">POSITIONAL</option>
+                <option value="SWING">SWING</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="subscription">Priority</label>
+            <select class="form-control" id="subscription" name="subscription" required>
+                <option value="UNPAID">UNPAID</option>
+                <option value="PAID">PAID</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3" maxlength="200"></textarea>
+            <small class="form-text text-muted">Maximum 200 characters.</small>
+        </div>
         <button type="submit" class="btn btn-primary">Create Group</button>
     </form>
 </div>

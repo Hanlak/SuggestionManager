@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Make Payment</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+          integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
+          crossorigin="anonymous">
+</head>
+<body>
+<div>
+    <div th:replace="/mainnavbar :: mainnavbar"></div>
+</div>
+<div class="container mt-5">
+    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+
+    <!-- Check if groupNames is empty -->
+    <div th:if="${groupNames.isEmpty()}">
+        <div class="alert alert-warning" role="alert">You are Not part of Any Expired Groups to make a payment</div>
+    </div>
+    <div th:unless="${groupNames.isEmpty()}">
+        <form id="subscriptionForm" th:action="@{/groups/makePayment}" method="post">
+            <div class="form-group">
+                <label for="groupName">Choose your group name from the list:</label>
+                <input type ="text" list="groupNames" name="groupName" id="groupName" value=""
+                       oninput="validateInput()">
+                <datalist id="groupNames">
+                    <option th:each="option : ${groupNames}" th:value="${option}" th:text="${option}"></option>
+                </datalist>
+            </div>
+
+            <div class="alert alert-info" id="groupNameDisplay">
+                <p>This is the Reference Page for agreeing to pay a default yearly subscription for group: <span
+                        id="displayedGroupName"></span></p>
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="submitPaymentBtn">Submit Payment</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function validateInput() {
+        var input = document.getElementById("groupName").value;
+        var options = document.getElementById("groupNames").options;
+
+        var isValid = Array.from(options).some(function (option) {
+            return option.value === input;
+        });
+
+        document.getElementById("submitPaymentBtn").disabled = !isValid;
+    }
+</script>
+</body>
+</html>

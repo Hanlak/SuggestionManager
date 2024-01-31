@@ -1,18 +1,14 @@
 package com.ssm.controller;
 
+import com.ssm.dto.UserGroupDTO;
 import com.ssm.entity.GroupRequest;
-import com.ssm.exception.GroupRequestException;
-import com.ssm.exception.PendingRequestException;
-import com.ssm.exception.UserAlreadyExistsException;
-import com.ssm.exception.UserNotFoundException;
+import com.ssm.exception.*;
 import com.ssm.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,8 +20,16 @@ import java.util.List;
 public class GroupController {
 
     @Autowired
-    private GroupService groupService;
+    GroupService groupService;
 
+    public GroupController(GroupService groupService) {
+        this.groupService = groupService;
+    }
+
+    @ModelAttribute("userGroup")
+    public UserGroupDTO userGroupDTO() {
+        return new UserGroupDTO();
+    }
 
     @GetMapping("/createGroup")
     public ModelAndView createGroup(Principal principal) {
@@ -35,9 +39,10 @@ public class GroupController {
     }
 
     @PostMapping("/createGroup")
-    public String createGroup(@RequestParam("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
+    public String createGroup(@ModelAttribute("userGroup") UserGroupDTO userGroupDTO, Principal principal, RedirectAttributes redirectAttributes) {
         try {
-            groupService.createGroup(groupName, principal.getName());
+            groupService.createGroup(userGroupDTO, principal.getName());
+            System.out.println(userGroupDTO.getGroupType() + " " + userGroupDTO.getSubscription());
             redirectAttributes.addFlashAttribute("info", "UserGroup Created Successfully");
             return "redirect:/index";
         } catch (UserNotFoundException | UserAlreadyExistsException userNotFoundException) {
@@ -50,15 +55,37 @@ public class GroupController {
     }
 
     @GetMapping("/requestToJoinGroup")
-    public ModelAndView requestToJoinGroup(Principal principal) {
-        ModelAndView modelAndView = new ModelAndView("joingroup");
-        modelAndView.addObject("username", principal.getName());
-        return modelAndView;
+    public String requestToJoinGroup(Principal principal, Model model) {
+        model.addAttribute("username", principal.getName());
+        List<UserGroupDTO> groups = groupService.getAllGroups();
+        model.addAttribute("groups", groups);
+        return "joingroup";
+    }
+
+    @GetMapping("/joinGroup/{groupId}/{groupName}")
+    public String joinGroup(Principal principal, @PathVariable("groupId") Long id, @PathVariable("groupName") String groupName, RedirectAttributes redirectAttributes, Model model) {
+        try {
+            if (groupService.isPaymentEligible(groupName, principal.getName())) {
+                //Check if there is a payment entry for the user and if it's there if it's a success payment or not;
+                model.addAttribute("groupName", groupName);
+                return "paypage";
+            } else {
+                return "redirect:/groups/sendRequest/" + groupName;
+            }
+        } catch (GroupNotFoundException exception) {
+            redirectAttributes.addFlashAttribute("error", exception.getMessage());
+            return "redirect:/groups/requestToJoinGroup";
+        } catch (UserAlreadyExistsException exception) {
+            redirectAttributes.addFlashAttribute("info", exception.getMessage());
+            return "redirect:/suggestion/groupIndex/" + id + "/" + groupName;
+        }
+
     }
 
 
-    @PostMapping("/sendRequest")
-    public String sendRequestToJoinGroup(@RequestParam("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
+
+    @GetMapping("/sendRequest/{groupName}")
+    public String sendRequestToJoinGroup(@PathVariable("groupName") String groupName, Principal principal, RedirectAttributes redirectAttributes) {
         try {
             Boolean isRequestSent = groupService.sendRequestToJoinGroup(groupName, principal.getName());
             if (isRequestSent) {

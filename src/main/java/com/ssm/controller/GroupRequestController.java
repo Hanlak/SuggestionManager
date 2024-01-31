@@ -1,6 +1,7 @@
 package com.ssm.controller;
 
 
+import com.ssm.exception.NotifyException;
 import com.ssm.service.GroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -27,10 +28,15 @@ public class GroupRequestController {
             Boolean isStatusUpdated = groupService.requestStatusUpdate(id, status);
             if (!isStatusUpdated) {
                 model.addAttribute("error", "SYSTEM ERROR: Error while Updating the Status");
-            } else model.addAttribute("info", "User Request Status Updated");
+            } else {
+                groupService.notifyUserAboutRequest(id, status);
+                model.addAttribute("info", "User Request Status Updated");
+            }
         } catch (DataAccessException dataAccessException) {
             model.addAttribute("error", "SYSTEM ERROR: Error while Updating the Status");
             return new ModelAndView("redirect:/groups/displayRequests", model);
+        } catch (NotifyException e) {
+            System.out.println("Throwing this error silently as this wont impact the functionality" + e.getMessage());
         }
         return new ModelAndView("redirect:/groups/displayRequests", model);
 

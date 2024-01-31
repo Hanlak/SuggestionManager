@@ -16,19 +16,92 @@
 <div class="container mt-5">
     <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
     <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-    <form th:action="@{/groups/sendRequest}" method="post">
+    <div class="container mt-3">
+        <h1 class="text-center">Group Finder</h1>
+    </div>
+    <!-- Search form -->
+    <form onsubmit="return searchGroups()">
         <div class="form-group">
-            <label for="groupName">Group Name:</label>
-            <input type="text" class="form-control form-control-sm" id="groupName" name="groupName"
-                   placeholder="Enter Group Name"
-                   pattern="[a-zA-Z0-9_]*"
-                   title="Only alphanumeric characters and underscore are allowed"
-                   minlength="5"
-                   maxlength="14"
-                   required>
+            <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+            <button type="submit" class="btn btn-primary mt-2">Search</button>
+            <button type="button" class="btn btn-secondary mt-2" onclick="clearSearch()">Clear</button>
         </div>
-        <button type="submit" class="btn btn-primary">Join Group</button>
     </form>
+
+    <!-- Display matched group name -->
+    <div id="matchedGroupName"></div>
+
+    <!-- Group table -->
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+        <tr>
+            <th>Group Name</th>
+            <th>Description</th>
+            <th>Group Type</th>
+            <th>Subscription</th>
+            <th>Action</th>
+        </tr>
+        </thead>
+        <tbody id="groupTableBody">
+        <tr th:each="group : ${groups}">
+            <td th:text="${group.groupName}"></td>
+            <td th:utext="${group.description}"></td>
+            <td th:text="${group.groupType}"></td>
+            <td th:text="${group.subscription}"></td>
+            <td>
+                <a class="btn btn-success btn-sm"
+                   th:href="@{'/groups/joinGroup/'+ ${group.id} + '/' + ${group.groupName}}"
+                   role="button">Join</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
+
+<script>
+    // JavaScript function to filter groups based on search input
+    function searchGroups() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("searchInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("groupTableBody");
+        tr = table.getElementsByTagName("tr");
+        var matchedGroupName = "";
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[0];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                    matchedGroupName = txtValue;
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+
+        // Display matched group name
+        var matchedGroupNameDiv = document.getElementById("matchedGroupName");
+        matchedGroupNameDiv.innerHTML = matchedGroupName === "" ? "No matches found." : "Matched Group Name: " + matchedGroupName;
+
+        // Prevent form submission
+        return false;
+    }
+
+    // JavaScript function to clear search input and show all groups
+    function clearSearch() {
+        document.getElementById("searchInput").value = "";
+        var table = document.getElementById("groupTableBody");
+        var tr = table.getElementsByTagName("tr");
+        for (var i = 0; i < tr.length; i++) {
+            tr[i].style.display = "";
+        }
+
+        // Clear matched group name
+        document.getElementById("matchedGroupName").innerHTML = "";
+    }
+
+</script>
+
 </body>
 </html>

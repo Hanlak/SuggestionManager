@@ -2,24 +2,38 @@
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
     <title>Index Page</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+    <link crossorigin="anonymous" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
           integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
-          crossorigin="anonymous">
+          rel="stylesheet">
+    <script th:src="@{/js/groupIndex.js}" defer="true"></script>
 </head>
 <body>
 <div>
     <div th:replace="/groupnavbar :: groupnavbar"></div>
 </div>
 <div class="container mt-4">
-    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
-    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+    <div class="alert alert-info" role="alert" th:if="${info}" th:text="${info}"></div>
+    <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
 
-    <div id="suggestionTable">
+
+    <div class="btn-group" role="group" aria-label="Toggle">
+        <button type="button" class="btn btn-primary" onclick="toggleTable('buy')">Buy Suggestions</button>
+        <button type="button" class="btn btn-primary" onclick="toggleTable('sell')">Sell Suggestions</button>
+    </div>
+
+
+    <div id="buySuggestionTable">
         <!-- Table for Buy Suggestions -->
         <h1>Buy Suggestions</h1>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search Buy Suggestions" id="buySearchInput"
+                   oninput="searchSuggestions('buySuggestionsTable', 'buySearchInput')">
+        </div>
+
+        <!-- Table For Buy Suggestions -->
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -31,7 +45,8 @@
                 <th>Stop Loss</th>
                 <th>QBOS</th>
                 <th>Confidence</th>
-                <th>Actions</th>
+                <th>Action</th>
+                <th>Discussion</th>
             </tr>
             </thead>
             <tbody id="buySuggestionsTable">
@@ -47,26 +62,39 @@
                 <td th:text="${buySuggestion.noOfLikes}">
                 <td>
 
-                    <a id="likeBuyButton" class="btn btn-primary btn-sm"
+                    <a class="btn btn-primary btn-sm" id="likeBuyButton"
                        th:onclick="toggleBuyLike([[${buySuggestion.id}]],[[${buySuggestion.likeState}]])"
                        th:text="${buySuggestion.likeState? 'Unlike' : 'Like'}"></a>
 
-
                     <!-- Add Edit and Delete buttons here -->
-                    <a th:if="${isAdmin}" th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
-                       class="btn btn-primary btn-sm">Edit</a>
+                    <a class="btn btn-primary btn-sm" th:href="@{'/suggestion/editBuySuggestion/'+ ${buySuggestion.id}}"
+                       th:if="${isAdmin}">Edit</a>
                     <!-- Delete button with link to delete controller -->
-                    <a th:if="${isAdmin}" th:href="@{'/suggestion/deleteSuggestion/'+ ${buySuggestion.id}}"
-                       class="btn btn-danger btn-sm">Delete</a>
+                    <a class="btn btn-danger btn-sm" th:href="@{'/suggestion/deleteSuggestion/'+ ${buySuggestion.id}}"
+                       th:if="${isAdmin}">Delete</a>
+                </td>
+                <td>
+                    <!--                    <div id="buySuggestionId" th:data-suggestionId="${buySuggestion.id}"></div>-->
+                    <button class="btn btn-primary btn-sm" data-target="#commentModal" data-toggle="modal"
+                            th:onclick="openCommentModal([[${buySuggestion.id}]])"
+                            type="button">
+                        Discussion
+                    </button>
                 </td>
             </tr>
             <!-- If buySuggestionsList is empty -->
             <tr th:if="${buySuggestions.isEmpty()}">
-                <td colspan="7" class="text-center">No data available</td>
+                <td class="text-center" colspan="7">No data available</td>
             </tr>
             </tbody>
         </table>
+    </div>
+    <div id="sellSuggestionTable" style="display: none;">
         <h1>Sell Suggestions</h1>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search Sell Suggestions" id="sellSearchInput"
+                   oninput="searchSuggestions('sellSuggestionsTable', 'sellSearchInput')">
+        </div>
         <table class="table table-bordered">
             <thead>
             <tr>
@@ -77,6 +105,7 @@
                 <th>PSO</th>
                 <th>Confidence</th>
                 <th>Actions</th>
+                <th>Discussion</th>
             </tr>
             </thead>
             <tbody id="sellSuggestionsTable">
@@ -91,85 +120,63 @@
                 </td>
                 <td>
 
-                    <a id="likeSellButton" class="btn btn-primary btn-sm"
+                    <a class="btn btn-primary btn-sm" id="likeSellButton"
                        th:onclick="toggleSellLike([[${sellSuggestion.id}]],[[${sellSuggestion.likeState}]])"
                        th:text="${sellSuggestion.likeState? 'Unlike' : 'Like'}"></a>
 
                     <!-- Add Edit and Delete buttons here -->
-                    <a th:if="${isAdmin}" th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"
-                       class="btn btn-primary btn-sm">Edit</a>
+                    <a class="btn btn-primary btn-sm"
+                       th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"
+                       th:if="${isAdmin}">Edit</a>
                     <!-- Delete button with link to delete controller -->
-                    <a th:if="${isAdmin}" th:href="@{'/suggestion/deleteSuggestion/'+ ${sellSuggestion.id}}"
-                       class="btn btn-danger btn-sm">Delete</a>
+                    <a class="btn btn-danger btn-sm"
+                       th:href="@{'/suggestion/deleteSuggestion/'+ ${sellSuggestion.id}}"
+                       th:if="${isAdmin}">Delete</a>
+                </td>
+                <td>
+                    <!--                    <div id="sellSuggestionId" th:data-suggestionId="${sellSuggestion.id}"></div>-->
+                    <button class="btn btn-primary btn-sm" data-target="#commentModal" data-toggle="modal"
+                            th:onclick="openCommentModal([[${sellSuggestion.id}]])"
+                            type="button">
+                        Discussion
+                    </button>
                 </td>
             </tr>
             <!-- If sellSuggestions is empty -->
             <tr th:if="${sellSuggestions.isEmpty()}">
-                <td colspan="5" class="text-center">No data available</td>
+                <td class="text-center" colspan="5">No data available</td>
             </tr>
             </tbody>
         </table>
+
+    </div>
+    <!-- Modal for comments -->
+    <div aria-hidden="true" aria-labelledby="commentModalLabel" class="modal fade" id="commentModal" role="dialog"
+         tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commentModalLabel">Discussions</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Comment input box -->
+                    <input class="form-control" id="commentInput" placeholder="Type your opinion..." type="text">
+
+                    <!-- Display opinions -->
+                    <div id="commentDisplay"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                    <!-- Add comment button -->
+                    <button class="btn btn-primary" onclick="addComment()" type="button">Add Comment</button>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script th:inline="javascript">
-function toggleBuyLike(buySuggestionId,buyLiked) {
-    const likeBuyButton = document.getElementById('likeBuyButton');
-    buyLiked = !buyLiked;
-    if (buyLiked) {
-      likeBuyButton.textContent = 'Unlike';
-      likeBuyButton.classList.remove('btn-primary');
-      likeBuyButton.classList.add('btn-danger');
-    } else {
-      likeBuyButton.textContent = 'Like';
-      likeBuyButton.classList.remove('btn-danger');
-      likeBuyButton.classList.add('btn-primary');
-    }
-    post_to_url("/suggestion/buyLike",{buySuggestionId:buySuggestionId,buyLiked:buyLiked},"POST");
-
-}
-
-function toggleSellLike(sellSuggestionId,sellLiked) {
-    const likeSellButton = document.getElementById('likeSellButton');
-    sellLiked = !sellLiked;
-
-    if (sellLiked) {
-      likeSellButton.textContent = 'Unlike';
-      likeSellButton.classList.remove('btn-primary');
-      likeSellButton.classList.add('btn-danger');
-    } else {
-      likeSellButton.textContent = 'Like';
-      likeSellButton.classList.remove('btn-danger');
-      likeSellButton.classList.add('btn-primary');
-    }
-    post_to_url("/suggestion/sellLike",{sellSuggestionId:sellSuggestionId,sellLiked:sellLiked},"POST");
-
-    }
-
-    function post_to_url(path, params, method) {
-        var form = document.createElement("form");
-        form.setAttribute("method", method);
-        form.setAttribute("action", path);
-
-        for(var key in params) {
-            if(params.hasOwnProperty(key)) {
-                var hiddenField = document.createElement("input");
-                hiddenField.setAttribute("type", "hidden");
-                hiddenField.setAttribute("name", key);
-                hiddenField.setAttribute("value", params[key]);
-
-                form.appendChild(hiddenField);
-             }
-        }
-
-        document.body.appendChild(form);
-        form.submit();
-        form.reset();
-    }
-
-
-
-
-</script>
 </body>
 </html>

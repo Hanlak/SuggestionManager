@@ -1,13 +1,18 @@
 package com.ssm.service;
 
+import com.ssm.dto.UserGroupDTO;
 import com.ssm.entity.GroupRequest;
+import com.ssm.entity.Payment;
 import com.ssm.entity.User;
 import com.ssm.entity.UserGroup;
 import com.ssm.exception.*;
+import com.ssm.mapper.IUserGroupMapper;
 import com.ssm.repository.GroupRepository;
 import com.ssm.repository.GroupRequestRepository;
+import com.ssm.repository.PaymentRepository;
 import com.ssm.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -23,30 +28,59 @@ public class GroupService {
     @Autowired
     GroupRepository groupRepository;
 
-
+    @Autowired
+    IUserGroupMapper userGroupMapper;
     @Autowired
     GroupRequestRepository groupRequestRepository;
 
-    public GroupService(UserRepository userRepository, GroupRepository groupRepository) {
+    @Autowired
+    PaymentRepository paymentRepository;
+    @Autowired
+    SSMMailService ssmMailService;
+
+
+    @Value("${mail_sender_user}")
+    private String mailSenderUser;
+
+
+    public GroupService(UserRepository userRepository, GroupRepository groupRepository, IUserGroupMapper userGroupMapper, SSMMailService ssmMailService, PaymentRepository paymentRepository) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
+        this.userGroupMapper = userGroupMapper;
+        this.ssmMailService = ssmMailService;
+        this.paymentRepository = paymentRepository;
     }
 
-    public void createGroup(String groupName, String adminUsername) throws UserNotFoundException, DataAccessException, UserAlreadyExistsException {
+    public void createGroup(UserGroupDTO userGroupDTO, String adminUsername) throws UserNotFoundException, DataAccessException, UserAlreadyExistsException {
         Optional<User> admin = userRepository.findByUserName(adminUsername);
         if (!admin.isPresent()) {
             throw new UserNotFoundException("User Not Found when Creating the userGroup");
         }
-        Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
+        Optional<UserGroup> group = groupRepository.findByGroupName(userGroupDTO.getGroupName());
 
         if (group.isPresent()) {
             throw new UserAlreadyExistsException("Group Already Exists.Please try with another Name");
         }
-        UserGroup userGroup = new UserGroup();
-        userGroup.setGroupName(groupName);
+        UserGroup userGroup = userGroupMapper.fromUserGroupDTO(userGroupDTO);
         userGroup.setAdmin(admin.get());
         userGroup.getUsers().add(admin.get()); // Admin is automatically added to the userGroup
         groupRepository.save(userGroup);
+    }
+
+    public Boolean isPaymentEligible(String groupName, String username) throws GroupNotFoundException, UserAlreadyExistsException {
+        Optional<UserGroup> group = groupRepository.findByGroupName(groupName);
+
+        if (group.isPresent()) {
+            if (username.equals(group.get().getAdmin().getUserName()) || group.get().getUsers().stream().anyMatch(x -> username.equals(x.getUserName()))) {
+                throw new UserAlreadyExistsException("You Already Part of the Group you are trying to Join.");
+            } else {
+                if ("PAID".equals(group.get().getSubscription().name())) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else throw new GroupNotFoundException("There is no Such Group Exists");
     }
 
     public Boolean sendRequestToJoinGroup(String groupName, String userName) throws DataAccessException, UserAlreadyExistsException, UserNotFoundException, GroupRequestException, PendingRequestException {
@@ -99,6 +133,7 @@ public class GroupService {
             if (userName.equals(group.get().getAdmin().getUserName())) {
                 groupRepository.deleteById(group.get().getId());
                 groupRequestRepository.deleteByUserGroup(group.get());
+                paymentRepository.updateSubscriptionStatusByUserGroup(group.get(), Payment.SubscriptionStatus.REDACTED);
             } else {
                 throw new UserNotFoundException("Only Admin of the Group Can delete the group");
             }
@@ -127,6 +162,7 @@ public class GroupService {
                     userRepository.save(member);
                     groupRepository.save(userGroup.get());
                     groupRequestRepository.deleteByUser(member);
+                    paymentRepository.updateSubscriptionStatusByUserGroupAndUser(userGroup.get(), member, Payment.SubscriptionStatus.LEFT);
                 } else {
                     throw new LeaveGroupException("Unable to find the member in" + userGroup.get().getGroupName());
                 }
@@ -159,21 +195,50 @@ public class GroupService {
                     userRepository.save(removeMember);
                     groupRepository.save(userGroup.get());
                     groupRequestRepository.deleteByUser(removeMember);
+                    paymentRepository.updateSubscriptionStatusByUserGroupAndUser(userGroup.get(), removeMember, Payment.SubscriptionStatus.REFUNDED);
+                    //send notification mail to user that he was being removed by the admin;
+                    ssmMailService.toSendEMailAsync(removeMember.getEmail(), mailSenderUser, "Suggestion Manager", "you have been removed from the" + userGroup.get().getGroupName() + " Group");
                 } else {
                     throw new UserNotFoundException("Unable to find the member in" + userGroup.get().getGroupName());
                 }
             }
         } else {
-            throw new GroupNotFoundException("Group did not Exist to delete");
+            throw new GroupNotFoundException("Group did not Exist to remove the members: weird right. contact support");
         }
     }
 
 
-    public List<UserGroup> getAllGroupsBasedOnUser(String adminUser) throws UserNotFoundException {
+    public List<UserGroupDTO> getAllGroupsBasedOnUser(String adminUser) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUserName(adminUser);
         if (!user.isPresent()) throw new UserNotFoundException("System Error: No Such User Exists");
-        return groupRepository.findByAdminOrUsers(user.get());
+        return groupRepository.findByAdminOrUsers(user.get()).stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
     }
+
+    public List<UserGroupDTO> getAllGroups() throws DataAccessException {
+        return groupRepository.findAll().stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
+    }
+
+    public List<String> getAllPaidNonAdminGroupsBasedOnUser(User user) throws DataAccessException {
+        return groupRepository.findByAdminOrUsers(user).stream()
+                .filter(this::isPaidGroup)
+                .filter(userGroup -> this.shouldNotBeAnAdmin(userGroup, user))
+                .map(userGroupMapper::fromUserGroup)
+                .map(UserGroupDTO::getGroupName)
+                .collect(Collectors.toList());
+    }
+
+    private boolean isPaidGroup(UserGroup userGroup) {
+        return UserGroup.Subscription.PAID.equals(userGroup.getSubscription());
+    }
+
+    private boolean shouldNotBeAnAdmin(UserGroup userGroup, User user) {
+        return !userGroup.getAdmin().getUserName().equals(user.getUserName());
+    }
+
+    public UserGroup getGroupByGroupName(String groupName) throws GroupNotFoundException {
+        return groupRepository.findByGroupName(groupName).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists; Please Try again"));
+    }
+
 
     public List<GroupRequest> displayPendingRequests(String username) throws UserNotFoundException {
         Optional<User> user = userRepository.findByUserName(username);
@@ -210,13 +275,18 @@ public class GroupService {
                 UserGroup savedUserGroup = groupRepository.save(userGroup);
                 return (!ObjectUtils.isEmpty(savedUserGroup)) && (!ObjectUtils.isEmpty(savedUser));
             } else {
-                System.out.println("There is another error while finding user or UserGroup from GroupRequest");
                 return false;
             }
         }
         return false;
     }
 
+    public void notifyUserAboutRequest(Long groupRequestId, String status) throws NotifyException {
+        GroupRequest groupRequest = groupRequestRepository.findById(groupRequestId).orElseThrow(() -> new NotifyException("Problem with Sending Notification"));
+        User user = groupRequest.getUser();
+        String message = "You have been " + ("ACCEPTED".equals(status) ? "accepted" : "rejected") + "to the group: " + groupRequest.getUserGroup().getGroupName();
+        ssmMailService.toSendEMailAsync(user.getEmail(), mailSenderUser, "SUGGESTION MANAGER :: JOIN REQUEST", message);
+    }
 
     public UserGroup getUserGroupBasedOnGroupId(Long groupId) throws GroupNotFoundException {
         return groupRepository.findById(groupId).orElseThrow(() -> new GroupNotFoundException("No Such Group Exists"));

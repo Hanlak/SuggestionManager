@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public class SuggestionService {
 
     @Autowired
-    private SuggestionRepository suggestionRepository;
+    private final SuggestionRepository suggestionRepository;
 
     @Autowired
     BuySuggestionRepository buySuggestionRepository;
@@ -112,12 +112,12 @@ public class SuggestionService {
 
 
     //ALL These needs to be handled with proper exceptions;
-    public List<BuySuggestion> getBuySuggestions() {
-        return buySuggestionRepository.findAll();
+    public List<BuySuggestion> getBuySuggestions(UserGroup userGroup) {
+        return buySuggestionRepository.findByUserGroup(userGroup);
     }
 
-    public List<SellSuggestion> getSellSuggestions() {
-        return sellSuggestionRepository.findAll();
+    public List<SellSuggestion> getSellSuggestions(UserGroup userGroup) {
+        return sellSuggestionRepository.findByUserGroup(userGroup);
     }
 
     public BuySuggestion getBuySuggestionById(Long id) throws SuggestionNotFoundException {
@@ -126,6 +126,14 @@ public class SuggestionService {
 
     public SellSuggestion getSellSuggestionById(Long id) throws SuggestionNotFoundException {
         return sellSuggestionRepository.findById(id).orElseThrow(() -> new SuggestionNotFoundException("Sell Suggestion Not Found to Edit"));
+    }
+
+    public StockSuggestion getStockSuggestion(Long id) throws SuggestionNotFoundException {
+        return suggestionRepository.findById(id).orElseThrow(() -> new SuggestionNotFoundException("Suggestion Not Found"));
+    }
+
+    public void addCommentToSuggestion(StockSuggestion suggestion) throws DataAccessException {
+        suggestionRepository.save(suggestion);
     }
 
     private User getUserForLikes(String username) throws UserNotFoundException {
@@ -226,8 +234,8 @@ public class SuggestionService {
         return suggestionLikeBasedOnUser;
     }
 
-    public List<BuyLikeSuggestionDTO> getBuyLikeSuggestions(String username) throws UserNotFoundException, LikesException {
-        List<BuySuggestion> buySuggestionList = getBuySuggestions();
+    public List<BuyLikeSuggestionDTO> getBuyLikeSuggestions(UserGroup userGroup, String username) throws UserNotFoundException, LikesException {
+        List<BuySuggestion> buySuggestionList = getBuySuggestions(userGroup);
         Map<Long, Boolean> suggestionLikeBasedOnUser = userSuggestionChoice(username);
         return buySuggestionList.stream()
                 .map(buySuggestion -> buyLikeSuggestionMapper.fromBuySuggestionAndChoice(
@@ -241,8 +249,8 @@ public class SuggestionService {
                 .collect(Collectors.toList());
     }
 
-    public List<SellLikeSuggestionDTO> getSellLikeSuggestions(String username) throws UserNotFoundException, LikesException {
-        List<SellSuggestion> sellSuggestionList = getSellSuggestions();
+    public List<SellLikeSuggestionDTO> getSellLikeSuggestions(UserGroup userGroup, String username) throws UserNotFoundException, LikesException {
+        List<SellSuggestion> sellSuggestionList = getSellSuggestions(userGroup);
         Map<Long, Boolean> suggestionLikeBasedOnUser = userSuggestionChoice(username);
         return sellSuggestionList.stream()
                 .map(sellSuggestion -> sellLikeSuggestionMapper.fromSellSuggestionAndChoice(

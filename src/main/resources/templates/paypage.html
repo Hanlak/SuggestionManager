@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <title>Subscription Page</title>
+</head>
+<body>
+
+<div class="container mt-5">
+    <form id="subscriptionForm" th:action="@{/groups/payment}" method="post">
+        <!-- Hidden groupName field -->
+        <input type="hidden" name="groupName" th:value="${groupName}">
+
+        <div class="alert alert-info">
+            <p>This is the Reference Page for agreeing to pay a default yearly subscription.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Payment</button>
+    </form>
+</div>
+
+<!-- Bootstrap JS and Popper.js -->
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+</body>
+</html>
