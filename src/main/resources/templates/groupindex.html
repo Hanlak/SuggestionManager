@@ -19,26 +19,18 @@
     <div class="alert alert-danger" role="alert" th:if="${error}" th:text="${error}"></div>
 
 
-    <div class="btn-group" role="group" aria-label="Basic example">
+    <div class="btn-group" role="group" aria-label="Toggle">
         <button type="button" class="btn btn-primary" onclick="toggleTable('buy')">Buy Suggestions</button>
         <button type="button" class="btn btn-primary" onclick="toggleTable('sell')">Sell Suggestions</button>
     </div>
 
 
-    <div id="suggestionTable">
+    <div id="buySuggestionTable">
         <!-- Table for Buy Suggestions -->
         <h1>Buy Suggestions</h1>
-        <!-- Search bar for Buy Suggestions -->
-        <div class="input-group mb-3">
-            <label for="buySearchInput">Filter:</label>
-            <input type="text" class="form-control" placeholder="Search Buy Suggestions" id="buySearchInput">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" onclick="searchTable('buy')">Search</button>
-            </div>
-        </div>
 
         <!-- Table For Buy Suggestions -->
-        <table id="buyTable" class="table table-bordered">
+        <table class="table table-bordered">
             <thead>
             <tr>
                 <!--                <th>ID</th>-->
@@ -92,16 +84,10 @@
             </tr>
             </tbody>
         </table>
+    </div>
+    <div id="sellSuggestionTable" style="display: none;">
         <h1>Sell Suggestions</h1>
-        <!-- Search bar Suggestions -->
-        <div class="input-group mb-3">
-            <label for="sellSearchInput">Filter:</label>
-            <input type="text" class="form-control" placeholder="Search Sell Suggestions" id="sellSearchInput">
-            <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" onclick="searchTable('sell')">Search</button>
-            </div>
-        </div>
-        <table id="sellTable" style="display: none;"  class="table table-bordered">
+        <table class="table table-bordered">
             <thead>
             <tr>
                 <!--                <th>ID</th>-->
@@ -135,7 +121,8 @@
                        th:href="@{'/suggestion/editSellSuggestion/'+ ${sellSuggestion.id}}"
                        th:if="${isAdmin}">Edit</a>
                     <!-- Delete button with link to delete controller -->
-                    <a class="btn btn-danger btn-sm" th:href="@{'/suggestion/deleteSuggestion/'+ ${sellSuggestion.id}}"
+                    <a class="btn btn-danger btn-sm"
+                       th:href="@{'/suggestion/deleteSuggestion/'+ ${sellSuggestion.id}}"
                        th:if="${isAdmin}">Delete</a>
                 </td>
                 <td>
@@ -153,6 +140,7 @@
             </tr>
             </tbody>
         </table>
+
     </div>
     <!-- Modal for comments -->
     <div aria-hidden="true" aria-labelledby="commentModalLabel" class="modal fade" id="commentModal" role="dialog"

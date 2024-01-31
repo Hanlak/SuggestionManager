@@ -163,36 +163,12 @@ function postComment(text) {
         throw error;
     });
 }
-function searchTable(type) {
-        var inputId = (type === 'buy') ? 'buySearchInput' : 'sellSearchInput';
-        var tableId = (type === 'buy') ? 'buySuggestionsTable' : 'sellSuggestionsTable';
-        var input, filter, table, tr, td, i, txtValue;
-
-        input = document.getElementById(inputId);
-        filter = input.value.toUpperCase();
-        table = document.getElementById(tableId);
-        tr = table.getElementsByTagName("tr");
-
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0]; // Adjust the index based on the column you want to search
-
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
-    }
-
- function toggleTable(tableType) {
+    function toggleTable(tableType) {
         if (tableType === 'buy') {
-            document.getElementById('buyTable').style.display = 'block';
-            document.getElementById('sellTable').style.display = 'none';
+            document.getElementById('buySuggestionTable').style.display = 'block';
+            document.getElementById('sellSuggestionTable').style.display = 'none';
         } else if (tableType === 'sell') {
-            document.getElementById('buyTable').style.display = 'none';
-            document.getElementById('sellTable').style.display = 'block';
+            document.getElementById('buySuggestionTable').style.display = 'none';
+            document.getElementById('sellSuggestionTable').style.display = 'block';
         }
     }
