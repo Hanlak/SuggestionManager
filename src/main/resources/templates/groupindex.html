@@ -28,6 +28,10 @@
     <div id="buySuggestionTable">
         <!-- Table for Buy Suggestions -->
         <h1>Buy Suggestions</h1>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search Buy Suggestions" id="buySearchInput"
+                   oninput="searchSuggestions('buySuggestionsTable', 'buySearchInput')">
+        </div>
 
         <!-- Table For Buy Suggestions -->
         <table class="table table-bordered">
@@ -87,6 +91,10 @@
     </div>
     <div id="sellSuggestionTable" style="display: none;">
         <h1>Sell Suggestions</h1>
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="Search Sell Suggestions" id="sellSearchInput"
+                   oninput="searchSuggestions('sellSuggestionsTable', 'sellSearchInput')">
+        </div>
         <table class="table table-bordered">
             <thead>
             <tr>
