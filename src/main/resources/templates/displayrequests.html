@@ -10,6 +10,7 @@
           crossorigin="anonymous">
 </head>
 <body>
+<div class="container-fluid">
 <div th:replace="/mainnavbar :: mainnavbar"></div>
 <div class="container mt-4">
     <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
@@ -43,6 +44,7 @@
         </tr>
         </tbody>
     </table>
+</div>
 </div>
 </body>
 </html>

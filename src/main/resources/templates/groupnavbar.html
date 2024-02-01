@@ -1,5 +1,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:th="http://www.thymeleaf.org">
+
 <div th:fragment="groupnavbar">
     <head>
         <meta charset="utf-8">
@@ -7,15 +8,10 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-        <style type="text/css">
-	.navbar-default .navbar-nav>li>a:hover {
-  		color: #4169E1;
-  	}
-
-        </style>
+        <link th:href="@{/css/navbar.css}" rel="stylesheet" type="text/css">
     </head>
     <body>
-    <nav class="navbar navbar-default bg-dark">
+    <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="/index">STOCK SUGGESTION MANAGER</a>
@@ -26,12 +22,14 @@
                 <li th:if="${isAdmin}"><a href="/suggestion/deleteGroup">Delete group</a></li>
                 <li><a href="/suggestion/showMembers">Show Members</a></li>
                 <li>
-                    <a th:href="'/suggestion/groupIndex/' +${userGroup.id} + '/' + ${groupName}">Group: <span
-                            th:text="${groupName}"></span>
+                    <a th:href="'/suggestion/groupIndex/' + ${userGroup.id} + '/' + ${groupName}">
+                        Group: <span th:text="${groupName}"
+                                     style="color: #00cc66; font-size: 22px; font-weight: bold;"></span>
                     </a>
                 </li>
                 <li>
-                    <a href="#">Logged In As: <span th:text="${username}"></span>
+                    <a href="#">Logged In As: <span th:text="${username}"
+                                                    style="color: #00cc66;font-size: 22px; font-weight: bold;"></span>
                     </a>
                 </li>
             </ul>

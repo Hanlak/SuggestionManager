@@ -10,40 +10,42 @@
           crossorigin="anonymous">
 </head>
 <body>
-<div>
-    <div th:replace="/mainnavbar :: mainnavbar"></div>
-</div>
-<div class="container mt-4">
-    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
-    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-    <div class="row">
-        <div class="col-md-8">
-            <h2>List of Groups</h2>
+<div class="container-fluid">
+    <div>
+        <div th:replace="/mainnavbar :: mainnavbar"></div>
+    </div>
+    <div class="container mt-4">
+        <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+        <div class="row">
+            <div class="col-md-8">
+                <h2>List of Groups</h2>
 
-            <!-- Display groups or empty message based on the condition -->
-            <th:block th:if="${not #lists.isEmpty(groups)}">
-                <ul class="list-group">
-                    <li class="list-group-item" th:each="group : ${groups}">
-                        <a th:href="@{'/suggestion/groupIndex/' + ${group.id} + '/' + ${group.groupName}}"
-                           class="list-group-item-action">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <span class="font-weight-bold text-lg" th:text="${group.groupName + ' - ' + group.groupType}"></span>
+                <!-- Display groups or empty message based on the condition -->
+                <th:block th:if="${not #lists.isEmpty(groups)}">
+                    <ul class="list-group">
+                        <li class="list-group-item" th:each="group : ${groups}">
+                            <a th:href="@{'/suggestion/groupIndex/' + ${group.id} + '/' + ${group.groupName}}"
+                               class="list-group-item-action">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <span class="font-weight-bold text-lg"
+                                              th:text="${group.groupName + ' - ' + group.groupType}"></span>
+                                    </div>
+                                    <div class="col-md-4" th:text="${group.description}"></div>
+                                    <div class="col-md-4" th:text="${group.subscription}"></div>
                                 </div>
-                                <div class="col-md-4" th:text="${group.description}"></div>
-                                <div class="col-md-4" th:text="${group.subscription}"></div>
-                            </div>
-                        </a>
-                    </li>
-                </ul>
-            </th:block>
+                            </a>
+                        </li>
+                    </ul>
+                </th:block>
 
-            <th:block th:unless="${not #lists.isEmpty(groups)}">
-                <p>No groups available.</p>
-            </th:block>
+                <th:block th:unless="${not #lists.isEmpty(groups)}">
+                    <p>No groups available.</p>
+                </th:block>
+            </div>
         </div>
     </div>
-
 
 </div>
 </body>

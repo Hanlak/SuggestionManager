@@ -1,0 +1,30 @@
+/* Navbar links hover effect */
+.navbar-dark .navbar-nav > li > a:hover {
+  color: #8A2BE2; /* Change to a different color on hover */
+}
+
+/* Active link styles */
+.navbar-dark .navbar-nav > .active > a,
+.navbar-dark .navbar-nav > .active > a:hover,
+.navbar-dark .navbar-nav > .active > a:focus {
+  background-color: #9932CC; /* New background color for the active link */
+  color: #ffffff; /* New text color for the active link */
+  border-radius: 5px; /* Optional: Add border-radius for rounded corners */
+  transition: background-color 0.3s, color 0.3s; /* Smooth transition effect */
+  font-weight: bold; /* Additional style for the active link */
+}
+
+.navbar-brand {
+  color: rgba(195, 155, 211, 0.8); /* Purple color with 80% opacity */
+  font-size: 26px;
+  font-family: "Arial", sans-serif;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+.navbar-dark .navbar-nav > li > a,
+.navbar-dark .navbar-nav > .active > a {
+  font-size: 18px;
+  font-weight: bold;
+}
