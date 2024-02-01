@@ -1,0 +1,44 @@
+ body {
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+
+        .container-fluid {
+            padding: 0;
+        }
+
+        .main-container {
+            margin-top: 50px;
+        }
+
+        .search-form {
+            margin-bottom: 20px;
+        }
+
+        .btn-primary,
+        .btn-secondary {
+            border-radius: 8px;
+        }
+
+        .table th,
+        .table td {
+            text-align: center;
+            font-size: 18px;
+        }
+
+.table th {
+    background-color: #6c757d; /* Medium gray color */
+    color: #ffffff;
+}
+
+        .table td {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        #matchedGroupName {
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.2rem;
+            color: #007bff;
+        }

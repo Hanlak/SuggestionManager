@@ -1,0 +1,48 @@
+/* style.css */
+
+body {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-family: 'Helvetica Neue', sans-serif;
+}
+
+.container-fluid {
+    padding: 0;
+}
+
+.main-container {
+    margin-top: 50px;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.alert {
+    border-radius: 8px;
+}
+
+h2, h3 {
+    color: #007bff;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-success {
+    border-radius: 8px;
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+label {
+    font-weight: bold;
+    color: #007bff;
+}
+
+.form-control {
+    border-radius: 8px;
+}
+
+/* Add more styles as needed */

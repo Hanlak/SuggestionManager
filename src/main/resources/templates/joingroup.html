@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Join Group</title>
+    <link th:href="@{/css/joingroup.css}" rel="stylesheet" type="text/css">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
           integrity="sha384-TI/t5CG9TWE6Si8CpM5d7jZ6rPMpJ2wBY8FcaFe1qT8WdrWyOs5z3QGlhOQQH2eGV"
@@ -11,53 +12,53 @@
 </head>
 <body>
 <div class="container-fluid">
-<div>
-    <div th:replace="/mainnavbar :: mainnavbar"></div>
-</div>
-<div class="container mt-5">
-    <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
-    <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
-    <div class="container mt-3">
-        <h1 class="text-center">Group Finder</h1>
+    <div>
+        <div th:replace="/mainnavbar :: mainnavbar"></div>
     </div>
-    <!-- Search form -->
-    <form onsubmit="return searchGroups()">
-        <div class="form-group">
-            <input type="text" class="form-control" id="searchInput" placeholder="Search...">
-            <button type="submit" class="btn btn-primary mt-2">Search</button>
-            <button type="button" class="btn btn-secondary mt-2" onclick="clearSearch()">Clear</button>
+    <div class="container mt-5">
+        <div th:if="${info}" class="alert alert-info" role="alert" th:text="${info}"></div>
+        <div th:if="${error}" class="alert alert-danger" role="alert" th:text="${error}"></div>
+        <div class="container mt-3">
+            <h1 class="text-center">Group Finder</h1>
         </div>
-    </form>
+        <!-- Search form -->
+        <form onsubmit="return searchGroups()">
+            <div class="form-group">
+                <input type="text" class="form-control" id="searchInput" placeholder="Search...">
+                <button type="submit" class="btn btn-primary mt-2">Search</button>
+                <button type="button" class="btn btn-secondary mt-2" onclick="clearSearch()">Clear</button>
+            </div>
+        </form>
 
-    <!-- Display matched group name -->
-    <div id="matchedGroupName"></div>
+        <!-- Display matched group name -->
+        <div id="matchedGroupName"></div>
 
-    <!-- Group table -->
-    <table class="table table-bordered table-hover">
-        <thead class="thead-light">
-        <tr>
-            <th>Group Name</th>
-            <th>Description</th>
-            <th>Group Type</th>
-            <th>Subscription</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody id="groupTableBody">
-        <tr th:each="group : ${groups}">
-            <td th:text="${group.groupName}"></td>
-            <td th:utext="${group.description}"></td>
-            <td th:text="${group.groupType}"></td>
-            <td th:text="${group.subscription}"></td>
-            <td>
-                <a class="btn btn-success btn-sm"
-                   th:href="@{'/groups/joinGroup/'+ ${group.id} + '/' + ${group.groupName}}"
-                   role="button">Join</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-</div>
+        <!-- Group table -->
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+            <tr>
+                <th>Group Name</th>
+                <th>Description</th>
+                <th>Group Type</th>
+                <th>Subscription</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody id="groupTableBody">
+            <tr th:each="group : ${groups}">
+                <td th:text="${group.groupName}"></td>
+                <td th:utext="${group.description}"></td>
+                <td th:text="${group.groupType}"></td>
+                <td th:text="${group.subscription}"></td>
+                <td>
+                    <a class="btn btn-success btn-sm"
+                       th:href="@{'/groups/joinGroup/'+ ${group.id} + '/' + ${group.groupName}}"
+                       role="button">Join</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 <script>
 // JavaScript function to filter groups based on search input
@@ -103,6 +104,7 @@ function searchGroups() {
         // Clear matched group name
         document.getElementById("matchedGroupName").innerHTML = "";
     }
+
 
 
 </script>

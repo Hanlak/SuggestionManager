@@ -30,6 +30,8 @@
                 <li>
                     <a href="#">Logged In As: <span th:text="${username}"
                                                     style="color: #00cc66;font-size: 22px; font-weight: bold;"></span>
+                        <span style="color: #00cc66;font-size: 22px; font-weight: bold;"
+                              th:if="${isAdmin}">[ ADMIN ]</span>
                     </a>
                 </li>
             </ul>
