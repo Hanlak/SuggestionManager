@@ -218,6 +218,17 @@ public class GroupService {
         return groupRepository.findAll().stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
     }
 
+    public List<UserGroupDTO> getAllGroupsUserNotPartOf(String username) throws DataAccessException {
+        return groupRepository.findAll().stream()
+                // Filter out groups where the user is the admin
+                .filter(userGroup -> !(username.equals(userGroup.getAdmin().getUserName())))
+                // Filter out groups where the user is a member
+                .filter(userGroup -> userGroup.getUsers().stream().noneMatch(user -> username.equals(user.getUserName())))
+                // Collect the remaining groups
+                .map(userGroupMapper::fromUserGroup)
+                .collect(Collectors.toList());
+    }
+
     public List<String> getAllPaidNonAdminGroupsBasedOnUser(User user) throws DataAccessException {
         return groupRepository.findByAdminOrUsers(user).stream()
                 .filter(this::isPaidGroup)

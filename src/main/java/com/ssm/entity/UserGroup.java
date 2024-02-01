@@ -48,6 +48,9 @@ public class UserGroup {
     @ManyToMany(mappedBy = "userGroups")
     private Set<User> users = new HashSet<>();
 
+    @OneToMany(mappedBy = "userGroup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GroupRequest> groupRequests = new HashSet<>();
+
     // Method to remove a user from the user group
     public void removeUser(User user) {
         this.getUsers().remove(user);

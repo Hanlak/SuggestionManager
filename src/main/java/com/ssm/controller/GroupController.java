@@ -57,7 +57,7 @@ public class GroupController {
     @GetMapping("/requestToJoinGroup")
     public String requestToJoinGroup(Principal principal, Model model) {
         model.addAttribute("username", principal.getName());
-        List<UserGroupDTO> groups = groupService.getAllGroups();
+        List<UserGroupDTO> groups = groupService.getAllGroupsUserNotPartOf(principal.getName());
         model.addAttribute("groups", groups);
         return "joingroup";
     }
