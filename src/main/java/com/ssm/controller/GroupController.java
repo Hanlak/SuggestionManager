@@ -68,6 +68,7 @@ public class GroupController {
             if (groupService.isPaymentEligible(groupName, principal.getName())) {
                 //Check if there is a payment entry for the user and if it's there if it's a success payment or not;
                 model.addAttribute("groupName", groupName);
+                model.addAttribute("username", principal.getName());
                 return "paypage";
             } else {
                 return "redirect:/groups/sendRequest/" + groupName;
@@ -81,7 +82,6 @@ public class GroupController {
         }
 
     }
-
 
 
     @GetMapping("/sendRequest/{groupName}")

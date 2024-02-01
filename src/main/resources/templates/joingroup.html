@@ -59,34 +59,36 @@
 </div>
 
 <script>
-    // JavaScript function to filter groups based on search input
-    function searchGroups() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("searchInput");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("groupTableBody");
-        tr = table.getElementsByTagName("tr");
-        var matchedGroupName = "";
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[0];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                    matchedGroupName = txtValue;
-                } else {
-                    tr[i].style.display = "none";
-                }
+// JavaScript function to filter groups based on search input
+function searchGroups() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("searchInput");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("groupTableBody");
+    tr = table.getElementsByTagName("tr");
+    var matchedGroupName = "";
+
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0];
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().startsWith(filter)) {
+                tr[i].style.display = "";
+                matchedGroupName = txtValue;
+            } else {
+                tr[i].style.display = "none";
             }
         }
-
-        // Display matched group name
-        var matchedGroupNameDiv = document.getElementById("matchedGroupName");
-        matchedGroupNameDiv.innerHTML = matchedGroupName === "" ? "No matches found." : "Matched Group Name: " + matchedGroupName;
-
-        // Prevent form submission
-        return false;
     }
+
+    // Display matched group name
+    var matchedGroupNameDiv = document.getElementById("matchedGroupName");
+    matchedGroupNameDiv.innerHTML = matchedGroupName === "" ? "No matches found." : "Matched Group Name: " + matchedGroupName;
+
+    // Prevent form submission
+    return false;
+}
+
 
     // JavaScript function to clear search input and show all groups
     function clearSearch() {
@@ -100,6 +102,7 @@
         // Clear matched group name
         document.getElementById("matchedGroupName").innerHTML = "";
     }
+
 
 </script>
 

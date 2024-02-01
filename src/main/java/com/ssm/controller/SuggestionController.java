@@ -53,6 +53,7 @@ public class SuggestionController {
         try {
             UserGroup userGroup = groupService.getUserGroupBasedOnGroupId(groupId);
             model.addAttribute("userGroup", userGroup);
+            model.addAttribute("username", principal.getName());
             boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
             // if he is admin of the group no need to check the paid stuff
             if (UserGroup.Subscription.PAID.equals(userGroup.getSubscription()) && !isAdmin) {
@@ -83,6 +84,7 @@ public class SuggestionController {
         if (ObjectUtils.isEmpty(userGroup))
             return "redirect:/logout?groupSessionExpired";
         model.addAttribute("userGroup", userGroup);
+        model.addAttribute("username", principal.getName());
         boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
         model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
         model.addAttribute("isAdmin", isAdmin);
@@ -308,6 +310,7 @@ public class SuggestionController {
         if (ObjectUtils.isEmpty(userGroup))
             return "redirect:/logout?groupSessionExpired";
         model.addAttribute("groupName", userGroup.getGroupName());
+        model.addAttribute("username", principal.getName());
         boolean isAdmin = principal.getName().equals(userGroup.getAdmin().getUserName());
         model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
         model.addAttribute("isAdmin", isAdmin);
