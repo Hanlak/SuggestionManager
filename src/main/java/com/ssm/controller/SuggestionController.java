@@ -58,8 +58,13 @@ public class SuggestionController {
             // if he is admin of the group no need to check the paid stuff
             if (UserGroup.Subscription.PAID.equals(userGroup.getSubscription()) && !isAdmin) {
                 String subscriptionStatusOrMessage = paymentService.validatePaymentSubscription(userGroup, principal.getName());
-                if (!"ACTIVE".equals(subscriptionStatusOrMessage))
+                if (!"ACTIVE".equals(subscriptionStatusOrMessage)) {
                     model.addAttribute("info", subscriptionStatusOrMessage);
+                    if (subscriptionStatusOrMessage.contains("removed")) {
+                        redirectAttributes.addFlashAttribute("info", subscriptionStatusOrMessage);
+                        return "redirect:/index";
+                    }
+                }
             }
             model.addAttribute("adminOfTheGroup", userGroup.getAdmin().getUserName());
             model.addAttribute("isAdmin", isAdmin);

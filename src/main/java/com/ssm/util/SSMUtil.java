@@ -42,7 +42,7 @@ public class SSMUtil {
             LocalDate currentDate = LocalDate.now();
 
             // Check if the current date is exactly 1 year and 3 days after the payment date
-            return currentDate.isEqual(oneYearThreeDaysAfterPaymentDate);
+            return currentDate.isAfter(oneYearThreeDaysAfterPaymentDate);
         }
         return false;
     }
@@ -51,11 +51,7 @@ public class SSMUtil {
         if (paymentDate != null) {
             LocalDate oneYearAfterPaymentDate = paymentDate.plus(1, ChronoUnit.YEARS);
             LocalDate currentDate = LocalDate.now();
-
-            // Check if the current date is within 7 days before one year after the payment date
-            if (currentDate.isBefore(oneYearAfterPaymentDate.minus(7, ChronoUnit.DAYS))) {
-                return ChronoUnit.DAYS.between(currentDate, oneYearAfterPaymentDate.minus(7, ChronoUnit.DAYS));
-            }
+            return ChronoUnit.DAYS.between(currentDate, oneYearAfterPaymentDate);
         }
         return -1;
     }

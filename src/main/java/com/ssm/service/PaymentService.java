@@ -94,7 +94,7 @@ public class PaymentService {
             } catch (Exception exception) {
                 throw new PaymentNotFoundException("You Subscription Expired But Error occurred while removing from Group. Contact Support");
             }
-            return "you have been removed from the group. please pay again to re join the group";
+            return "you have been removed from the group. please re join the group by making a payment";
         }
         if (Payment.SubscriptionStatus.EXPIRED.equals(payment.getSubscriptionStatus())) {
             throw new SubscriptionExpiredException("You Subscription has been expired.Please pay to gain access");
@@ -108,7 +108,7 @@ public class PaymentService {
         if (SSMUtil.isWithin7DaysOfOneYearAfterPaymentDate(paymentDate)) {
             long remainingDays = SSMUtil.daysBefore7DaysOfOneYearAnniversary(paymentDate);
             if (remainingDays == -1)
-                throw new PaymentNotFoundException("Issue with Subscription: contact payment support");
+                throw new PaymentNotFoundException("Issue with Subscription: contact payment support{payment date:null");
             return "You Subscription gonna expire in " + remainingDays + " days. Please pay before its expired";
         }
         return Payment.SubscriptionStatus.ACTIVE.toString();
