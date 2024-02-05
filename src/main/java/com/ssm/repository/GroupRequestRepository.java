@@ -17,6 +17,7 @@ import java.util.Optional;
 @Transactional
 public interface GroupRequestRepository extends JpaRepository<GroupRequest, Long> {
     Optional<GroupRequest> findByUser(User user);
+    Optional<GroupRequest> findByUserAndUserGroup(User user,UserGroup userGroup);
 
     void deleteByUserGroup(UserGroup userGroup);
     void deleteByUser(User user);

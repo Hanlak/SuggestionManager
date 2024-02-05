@@ -93,7 +93,7 @@ public class GroupService {
             if (checkUserPartOfGroup.contains(user.get())) {
                 throw new UserAlreadyExistsException("You Already Part of the Group you are trying to Join.");
             } else {
-                Optional<GroupRequest> groupRequest = groupRequestRepository.findByUser(user.get());
+                Optional<GroupRequest> groupRequest = groupRequestRepository.findByUserAndUserGroup(user.get(),group.get());
                 if (!groupRequest.isPresent()) { //when group is not there we send a new request
                     return sendRequest(group.get(), user.get());
 
