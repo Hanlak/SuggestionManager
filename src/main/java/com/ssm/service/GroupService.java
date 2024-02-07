@@ -93,7 +93,7 @@ public class GroupService {
             if (checkUserPartOfGroup.contains(user.get())) {
                 throw new UserAlreadyExistsException("You Already Part of the Group you are trying to Join.");
             } else {
-                Optional<GroupRequest> groupRequest = groupRequestRepository.findByUserAndUserGroup(user.get(),group.get());
+                Optional<GroupRequest> groupRequest = groupRequestRepository.findByUserAndUserGroup(user.get(), group.get());
                 if (!groupRequest.isPresent()) { //when group is not there we send a new request
                     return sendRequest(group.get(), user.get());
 
@@ -218,7 +218,7 @@ public class GroupService {
         return groupRepository.findAll().stream().map(userGroupMapper::fromUserGroup).collect(Collectors.toList());
     }
 
-    public List<UserGroupDTO> getAllGroupsUserNotPartOf(String username) throws DataAccessException {
+    private List<UserGroupDTO> getAllGroupsUserNotPartOf(String username) throws DataAccessException {
         return groupRepository.findAll().stream()
                 // Filter out groups where the user is the admin
                 .filter(userGroup -> !(username.equals(userGroup.getAdmin().getUserName())))
@@ -226,6 +226,23 @@ public class GroupService {
                 .filter(userGroup -> userGroup.getUsers().stream().noneMatch(user -> username.equals(user.getUserName())))
                 // Collect the remaining groups
                 .map(userGroupMapper::fromUserGroup)
+                .collect(Collectors.toList());
+    }
+
+    public List<UserGroupDTO> getAllGroupsOnSortingOrder(String username) {
+        List<UserGroupDTO> newUserGroupDTO = new ArrayList<>();
+        List<UserGroupDTO> userGroupDTOS = getAllGroupsUserNotPartOf(username);
+        List<UserGroupDTO> onlyPaidSortedGroups = getOnlySpecificGroups(userGroupDTOS, UserGroup.Subscription.PAID);
+        List<UserGroupDTO> onlyUnPaidSortedGroups = getOnlySpecificGroups(userGroupDTOS, UserGroup.Subscription.UNPAID);
+        newUserGroupDTO.addAll(onlyUnPaidSortedGroups);
+        newUserGroupDTO.addAll(onlyPaidSortedGroups);
+        return newUserGroupDTO;
+    }
+
+    private List<UserGroupDTO> getOnlySpecificGroups(List<UserGroupDTO> userGroupDTOS, UserGroup.Subscription subscription) {
+        return userGroupDTOS.stream()
+                .filter(userGroupDTO -> subscription.equals(userGroupDTO.getSubscription()))
+                .sorted(Comparator.comparing(UserGroupDTO::getGroupName))
                 .collect(Collectors.toList());
     }
 
